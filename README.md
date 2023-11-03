@@ -1,5 +1,5 @@
 
-# Digital Biome for Bipedal Robot
+# Digital Biome for ROS/RTOS Integration in Bipedal Robot
 
 ## Overview
 This project implements a digital biome for a bipedal robot, creating an adaptive and interactive environment for robotic systems. The digital biome incorporates neural networks for decision-making, genetic algorithms for evolutionary processes, sensor data processing, and a simulation environment.
