@@ -24,12 +24,15 @@ class Individual:
         return sensor_processing_value
 
     def make_decision(self, processed_sensor_data):
-        # Decision-making with neural network
+        # Use the neural network model to make a decision and get a reward
         prediction = self.neural_network_model.predict(processed_sensor_data)
         decision = prediction[0][0]  # Assuming first output is decision
         reward = prediction[1][0]  # Assuming second output is reward
+
+        # Log the decision and reward
         self.decision_log.append(decision)  # Log decision
         self.reward_log.append(reward)      # Log reward
+
         return decision, reward
     
     def interact_with_robot(self, decision):
