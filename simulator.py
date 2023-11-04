@@ -40,10 +40,11 @@ class Simulator:
             child = self.mutate(child)
             next_generation.append(child)
         self.population = next_generation
-    
+        
     def run_simulation(self, generations):
-        fitness_over_time = []
-        decisions_over_time = []
+        fitness_over_time = []  # List to store fitness data over time
+        decisions_over_time = []  # List to store decision data over time
+
         for generation in range(generations):
             print(f"Running Generation {generation + 1}")
             
@@ -55,5 +56,18 @@ class Simulator:
                 individual.interact_with_robot(decision)
                 individual.evaluate_fitness(reward)
             
+            # Collect data after interactions
+            generation_fitness = [individual.fitness for individual in self.population]
+            generation_decisions = [individual.decision_log for individual in self.population]
+            fitness_over_time.append(generation_fitness)
+            decisions_over_time.append(generation_decisions)
+            
             # Evolutionary adaptation
             self.run_one_generation()
+
+            # Reset decision logs for the next generation
+            for individual in self.population:
+                individual.decision_log = []
+                individual.reward_log = []
+
+        return fitness_over_time, decisions_over_time
