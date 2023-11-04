@@ -1,41 +1,51 @@
-
 from tensorflow import keras
 from tensorflow.keras import layers, regularizers, optimizers
+import tensorflow as tf
 
-def create_neural_network_model():
-    # Define two separate input layers; shape based on actual sensor data dimensions
-    input_dense = keras.Input(shape=(10,), name='Crown_Dense')  # Example reduced shape
-    input_sparse = keras.Input(shape=(10,), name='Crown_Sparse')  # Example reduced shape
+def positional_encoding(seq_length, d_model):
+    position = tf.range(seq_length)[:, tf.newaxis]
+    div_term = tf.exp(tf.range(0, d_model, 2) * -(tf.math.log(10000.0) / d_model))
+    pos_encoding = position * div_term
+    pos_encoding[:, 0::2] = tf.sin(pos_encoding[:, 0::2])
+    pos_encoding[:, 1::2] = tf.cos(pos_encoding[:, 1::2])
+    pos_encoding = pos_encoding[tf.newaxis, ...]
+    return tf.cast(pos_encoding, dtype=tf.float32)
 
-    # Dense Pathway; optimized for real-time and computational efficiency
-    x_dense = layers.Dense(32, activation='relu', kernel_regularizer=regularizers.l1_l2(l1=0.001, l2=0.001))(input_dense)
-    x_wisdom_dense = layers.Dense(32)(x_dense)
-    x_wisdom_dense = layers.BatchNormalization()(x_wisdom_dense)
-    x_wisdom_dense = layers.LeakyReLU()(x_wisdom_dense)
-    x_foundation_dense = layers.Dense(64, activation='relu')(x_wisdom_dense)
+def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
+    x = layers.LayerNormalization(epsilon=1e-6)(inputs)
+    x = layers.MultiHeadAttention(key_dim=head_size, num_heads=num_heads, dropout=dropout)(x, x)
+    x = layers.Dropout(dropout)(x)
+    res = x + inputs
 
-    # Sparse Pathway; optimized for real-time and computational efficiency
-    x_sparse = layers.Dense(32, kernel_regularizer=regularizers.l1_l2(l1=0.001, l2=0.001))(input_sparse)
-    x_wisdom_sparse = layers.Dense(32)(x_sparse)
-    x_wisdom_sparse = layers.BatchNormalization()(x_wisdom_sparse)
-    x_wisdom_sparse = layers.LeakyReLU()(x_wisdom_sparse)
-    x_foundation_sparse = layers.Dense(64)(x_wisdom_sparse)
+    x = layers.LayerNormalization(epsilon=1e-6)(res)
+    x = layers.Dense(ff_dim, activation="relu")(x)
+    x = layers.Dropout(dropout)(x)
+    x = layers.Dense(inputs.shape[-1])(x)
+    return x + res
 
-    # Data Fusion; optimized for real-time operation
-    x_fused = layers.Concatenate()([x_foundation_dense, x_foundation_sparse])
-    x_fused = layers.Dropout(0.2)(layers.Dense(128, activation='relu')(x_fused))
+def create_neural_network_model(seq_length, d_model):
+    input_dense = keras.Input(shape=(seq_length, d_model), name='Crown_Dense')
+    input_sparse = keras.Input(shape=(seq_length, d_model), name='Crown_Sparse')
 
-    # Output and Reward Layers; optimized for computational efficiency and real-time operation
-    output_layer = layers.Dense(5, activation='softmax')(x_fused)  # Example: 5 classes
-    reward_layer = layers.Dense(1)(x_fused)  # Kept the same, assuming it's essential
+    pos_dense = positional_encoding(seq_length, d_model) + input_dense
+    pos_sparse = positional_encoding(seq_length, d_model) + input_sparse
 
-    # Create the model; additional metrics or compile options can be added
+    x_dense = layers.Dense(32, activation='relu', kernel_regularizer=regularizers.l1_l2(l1=0.001, l2=0.001))(pos_dense)
+    x_dense = transformer_encoder(x_dense, head_size=32, num_heads=2, ff_dim=64)
+
+    x_sparse = layers.Dense(32, kernel_regularizer=regularizers.l1_l2(l1=0.001, l2=0.001))(pos_sparse)
+    x_sparse = transformer_encoder(x_sparse, head_size=32, num_heads=2, ff_dim=64)
+
+    x_fused = layers.Concatenate()([x_dense, x_sparse])
+    x_fused = transformer_encoder(x_fused, head_size=64, num_heads=4, ff_dim=128)
+
+    output_layer = layers.Dense(5, activation='softmax', name='Output')(x_fused)
+    reward_layer = layers.Dense(1, name='Reward')(x_fused)
+
     model = keras.Model(inputs=[input_dense, input_sparse], outputs=[output_layer, reward_layer])
-
-    # Advanced Optimizer
     opt = optimizers.Adam(learning_rate=0.001)
-
-    # Compile the model
-    model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=opt, loss={'Output': 'categorical_crossentropy', 'Reward': 'mean_squared_error'},
+                  metrics={'Output': 'accuracy'})
 
     return model
+
