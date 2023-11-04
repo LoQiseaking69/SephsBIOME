@@ -8,6 +8,8 @@ class Individual:
         self.energy = 100  # Initial energy
         self.health = 100  # Initial health
         self.neural_network_model = create_neural_network_model(seq_length, d_model)
+        self.decision_log = []  # Add this line to log decisions
+        self.reward_log = []    # Add this line to log rewards
     
     def process_sensor_data(self, sensor_data):
         # Process sensor data based on individual's genome
@@ -26,6 +28,8 @@ class Individual:
         prediction = self.neural_network_model.predict(processed_sensor_data)
         decision = prediction[0][0]  # Assuming first output is decision
         reward = prediction[1][0]  # Assuming second output is reward
+        self.decision_log.append(decision)  # Log decision
+        self.reward_log.append(reward)      # Log reward
         return decision, reward
     
     def interact_with_robot(self, decision):
