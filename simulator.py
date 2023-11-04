@@ -42,6 +42,8 @@ class Simulator:
         self.population = next_generation
     
     def run_simulation(self, generations):
+        fitness_over_time = []
+        decisions_over_time = []
         for generation in range(generations):
             print(f"Running Generation {generation + 1}")
             
