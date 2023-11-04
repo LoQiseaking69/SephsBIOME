@@ -30,11 +30,9 @@ class Genome:
                     self.remove_random_connection()
 
     def add_random_connection(self):
-        # Randomly select source and sink types and numbers
-        # You might want to set max values for source_num and sink_num based on your design
         source_type = random.choice([0, 1])
         sink_type = random.choice([0, 1])
-        source_num = random.randint(0, 10)  # 10 is just an example value
+        source_num = random.randint(0, 10)
         sink_num = random.randint(0, 10)
         weight = random.uniform(-1, 1)
         self.add_connection(source_type, source_num, sink_type, sink_num, weight)
