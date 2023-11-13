@@ -2,6 +2,21 @@ from tensorflow import keras
 from tensorflow.keras import layers, regularizers, optimizers
 import tensorflow as tf
 
+class BoolformerLayer(layers.Layer):
+    def __init__(self, **kwargs):
+        super(BoolformerLayer, self).__init__(**kwargs)
+        # Initialize additional components here if needed
+
+    def build(self, input_shape):
+        super(BoolformerLayer, self).build(input_shape)
+
+    def call(self, inputs):
+        # Enhanced boolean logic operations for real-time and decision-making
+        # Example operation: logical AND combined with a linear transformation
+        logic_and = tf.math.logical_and(inputs, inputs)
+        logic_transformed = layers.Dense(inputs.shape[-1], activation='relu')(logic_and)
+        return logic_transformed
+
 def positional_encoding(seq_length, d_model):
     position = tf.range(seq_length)[:, tf.newaxis]
     div_term = tf.exp(tf.range(0, d_model, 2) * -(tf.math.log(10000.0) / d_model))
@@ -37,10 +52,11 @@ def create_neural_network_model(seq_length, d_model):
     x_sparse = transformer_encoder(x_sparse, head_size=32, num_heads=2, ff_dim=64)
 
     x_fused = layers.Concatenate()([x_dense, x_sparse])
-    x_fused = transformer_encoder(x_fused, head_size=64, num_heads=4, ff_dim=128)
+    x_bool = BoolformerLayer()(x_fused)
+    x_bool = transformer_encoder(x_bool, head_size=64, num_heads=4, ff_dim=128)
 
-    output_layer = layers.Dense(5, activation='softmax', name='Output')(x_fused)
-    reward_layer = layers.Dense(1, name='Reward')(x_fused)
+    output_layer = layers.Dense(5, activation='softmax', name='Output')(x_bool)
+    reward_layer = layers.Dense(1, name='Reward')(x_bool)
 
     model = keras.Model(inputs=[input_dense, input_sparse], outputs=[output_layer, reward_layer])
     opt = optimizers.Adam(learning_rate=0.001)
@@ -48,4 +64,3 @@ def create_neural_network_model(seq_length, d_model):
                   metrics={'Output': 'accuracy'})
 
     return model
-
