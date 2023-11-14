@@ -8,16 +8,18 @@ class BoolformerLayer(layers.Layer):
         # Initialize additional components here if needed
 
     def build(self, input_shape):
+        # Add components that will be initialized when the layer is built
         super(BoolformerLayer, self).build(input_shape)
+        self.dense_layer = layers.Dense(input_shape[-1], activation='relu')
 
     def call(self, inputs):
-        # Enhanced boolean logic operations for real-time and decision-making
-        # Example operation: logical AND combined with a linear transformation
+        # Enhanced boolean logic operations for real-time decision-making
         logic_and = tf.math.logical_and(inputs, inputs)
-        logic_transformed = layers.Dense(inputs.shape[-1], activation='relu')(logic_and)
+        logic_transformed = self.dense_layer(logic_and)
         return logic_transformed
 
 def positional_encoding(seq_length, d_model):
+    # Positional encoding for transformer model
     position = tf.range(seq_length)[:, tf.newaxis]
     div_term = tf.exp(tf.range(0, d_model, 2) * -(tf.math.log(10000.0) / d_model))
     pos_encoding = position * div_term
@@ -27,6 +29,7 @@ def positional_encoding(seq_length, d_model):
     return tf.cast(pos_encoding, dtype=tf.float32)
 
 def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
+    # Transformer encoder for processing inputs
     x = layers.LayerNormalization(epsilon=1e-6)(inputs)
     x = layers.MultiHeadAttention(key_dim=head_size, num_heads=num_heads, dropout=dropout)(x, x)
     x = layers.Dropout(dropout)(x)
@@ -39,6 +42,7 @@ def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
     return x + res
 
 def create_neural_network_model(seq_length, d_model):
+    # Neural network model creation
     input_dense = keras.Input(shape=(seq_length, d_model), name='Crown_Dense')
     input_sparse = keras.Input(shape=(seq_length, d_model), name='Crown_Sparse')
 
@@ -55,8 +59,8 @@ def create_neural_network_model(seq_length, d_model):
     x_bool = BoolformerLayer()(x_fused)
     x_bool = transformer_encoder(x_bool, head_size=64, num_heads=4, ff_dim=128)
 
-    output_layer = layers.Dense(5, activation='softmax', name='Output')(x_bool)
-    reward_layer = layers.Dense(1, name='Reward')(x_bool)
+    output_layer = layers.Dense(5, activation='softmax', name='Output')(x_bool)  # Decision layer
+    reward_layer = layers.Dense(1, name='Reward')(x_bool)  # Reward estimation layer
 
     model = keras.Model(inputs=[input_dense, input_sparse], outputs=[output_layer, reward_layer])
     opt = optimizers.Adam(learning_rate=0.001)
