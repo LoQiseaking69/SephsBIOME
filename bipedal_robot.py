@@ -1,3 +1,4 @@
+from std_msgs.msg import String, Float64
 
 class BipedalRobot:
     def __init__(self):
@@ -8,7 +9,6 @@ class BipedalRobot:
     def receive_assistance(self, individual):
         # Example implementation: Individuals can assist the bipedal robot in various ways
         self.computatioimport rospy
-from std_msgs.msg import String, Float64
 
 class BipedalRobot:
     def __init__(self):
