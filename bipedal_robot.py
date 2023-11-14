@@ -1,14 +1,5 @@
 from std_msgs.msg import String, Float64
-
-class BipedalRobot:
-    def __init__(self):
-        self.computation_power = 100  # Initial computation power
-        self.mobility = 100  # Initial mobility
-        self.learning_ability = 100  # Initial learning ability
-
-    def receive_assistance(self, individual):
-        # Example implementation: Individuals can assist the bipedal robot in various ways
-        self.computatioimport rospy
+import rospy
 
 class BipedalRobot:
     def __init__(self):
@@ -39,9 +30,9 @@ class BipedalRobot:
 
     def apply_assistance(self, individual):
         # Apply assistance based on individual's capabilities and robot's current state
-        self.computation_power += self.calculate_boost(individual.assist_computation(), self.computation_power)
-        self.mobility += self.calculate_boost(individual.assist_mobility(), self.mobility)
-        self.learning_ability += self.calculate_boost(individual.assist_learning(), self.learning_ability)
+        self.computation_power += individual.assist_computation()
+        self.mobility += individual.assist_mobility()
+        self.learning_ability += individual.assist_learning()
 
     def calculate_boost(self, assistance_value, current_value):
         # Calculate the boost value based on current capability and assistance
@@ -62,9 +53,3 @@ class BipedalRobot:
 # Example usage (uncomment when running in a ROS environment)
 # robot = BipedalRobot()
 # rospy.spin()  # Keep the node running
-n_power += individual.assist_computation()
-        self.mobility += individual.assist_mobility()
-        self.learning_ability += individual.assist_learning()
-
-    def __repr__(self):
-        return f"Bipedal Robot - Computation: {self.computation_power}, Mobility: {self.mobility}, Learning: {self.learning_ability}"
