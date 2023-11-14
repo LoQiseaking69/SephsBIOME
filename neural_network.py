@@ -8,18 +8,15 @@ class BoolformerLayer(layers.Layer):
         # Initialize additional components here if needed
 
     def build(self, input_shape):
-        # Add components that will be initialized when the layer is built
         super(BoolformerLayer, self).build(input_shape)
         self.dense_layer = layers.Dense(input_shape[-1], activation='relu')
 
     def call(self, inputs):
-        # Enhanced boolean logic operations for real-time decision-making
         logic_and = tf.math.logical_and(inputs, inputs)
         logic_transformed = self.dense_layer(logic_and)
         return logic_transformed
 
 def positional_encoding(seq_length, d_model):
-    # Positional encoding for transformer model
     position = tf.range(seq_length)[:, tf.newaxis]
     div_term = tf.exp(tf.range(0, d_model, 2) * -(tf.math.log(10000.0) / d_model))
     pos_encoding = position * div_term
@@ -29,7 +26,6 @@ def positional_encoding(seq_length, d_model):
     return tf.cast(pos_encoding, dtype=tf.float32)
 
 def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
-    # Transformer encoder for processing inputs
     x = layers.LayerNormalization(epsilon=1e-6)(inputs)
     x = layers.MultiHeadAttention(key_dim=head_size, num_heads=num_heads, dropout=dropout)(x, x)
     x = layers.Dropout(dropout)(x)
@@ -41,28 +37,37 @@ def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
     x = layers.Dense(inputs.shape[-1])(x)
     return x + res
 
-def create_neural_network_model(seq_length, d_model):
-    # Neural network model creation
-    input_dense = keras.Input(shape=(seq_length, d_model), name='Crown_Dense')
-    input_sparse = keras.Input(shape=(seq_length, d_model), name='Crown_Sparse')
+class QLearningLayer(layers.Layer):
+    def __init__(self, action_space_size, learning_rate=0.01, gamma=0.95, **kwargs):
+        super(QLearningLayer, self).__init__(**kwargs)
+        self.action_space_size = action_space_size
+        self.learning_rate = learning_rate
+        self.gamma = gamma
+        self.q_table = None
 
-    pos_dense = positional_encoding(seq_length, d_model) + input_dense
-    pos_sparse = positional_encoding(seq_length, d_model) + input_sparse
+    def build(self, input_shape):
+        self.q_table = tf.Variable(initial_value=tf.random.uniform([input_shape[-1], self.action_space_size], 0, 1), trainable=True)
 
-    x_dense = layers.Dense(32, activation='relu', kernel_regularizer=regularizers.l1_l2(l1=0.001, l2=0.001))(pos_dense)
-    x_dense = transformer_encoder(x_dense, head_size=32, num_heads=2, ff_dim=64)
+    def call(self, state, action=None, reward=None, next_state=None):
+        if action is not None and reward is not None and next_state is not None:
+            q_update = reward + self.gamma * tf.reduce_max(self.q_table[next_state])
+            self.q_table[state, action].assign((1 - self.learning_rate) * self.q_table[state, action] + self.learning_rate * q_update)
 
-    x_sparse = layers.Dense(32, kernel_regularizer=regularizers.l1_l2(l1=0.001, l2=0.001))(pos_sparse)
-    x_sparse = transformer_encoder(x_sparse, head_size=32, num_heads=2, ff_dim=64)
+        return tf.argmax(self.q_table[state], axis=1)
 
-    x_fused = layers.Concatenate()([x_dense, x_sparse])
-    x_bool = BoolformerLayer()(x_fused)
-    x_bool = transformer_encoder(x_bool, head_size=64, num_heads=4, ff_dim=128)
+def create_neural_network_model(seq_length, d_model, action_space_size):
+    input_layer = keras.Input(shape=(seq_length, d_model))
 
-    output_layer = layers.Dense(5, activation='softmax', name='Output')(x_bool)  # Decision layer
-    reward_layer = layers.Dense(1, name='Reward')(x_bool)  # Reward estimation layer
+    pos_encoded = positional_encoding(seq_length, d_model) + input_layer
+    transformer_output = transformer_encoder(pos_encoded, head_size=32, num_heads=2, ff_dim=64)
 
-    model = keras.Model(inputs=[input_dense, input_sparse], outputs=[output_layer, reward_layer])
+    x_bool = BoolformerLayer()(transformer_output)
+    rl_layer = QLearningLayer(action_space_size=action_space_size)(x_bool)
+
+    output_layer = layers.Dense(action_space_size, activation='softmax', name='Output')(rl_layer)
+    reward_layer = layers.Dense(1, name='Reward')(rl_layer)
+
+    model = keras.Model(inputs=input_layer, outputs=[output_layer, reward_layer])
     opt = optimizers.Adam(learning_rate=0.001)
     model.compile(optimizer=opt, loss={'Output': 'categorical_crossentropy', 'Reward': 'mean_squared_error'},
                   metrics={'Output': 'accuracy'})
