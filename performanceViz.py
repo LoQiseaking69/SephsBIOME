@@ -1,26 +1,52 @@
-# visualization.py
+import rospy
 import matplotlib.pyplot as plt
+import numpy as np
+from std_msgs.msg import Float32MultiArray
+from collections import deque
+from threading import Thread
 
-# Assume simulator has been run and we have the data
-fitness_over_time, decisions_over_time = ... # Get this data from the simulator
+class PerformanceVisualizer:
+    def __init__(self, buffer_size=100):
+        rospy.init_node('performance_visualizer')
+        
+        self.buffer_size = buffer_size
+        self.data_buffers = {
+            'fitness': deque(maxlen=buffer_size),
+            'energy': deque(maxlen=buffer_size),
+            'health': deque(maxlen=buffer_size),
+            'decision': deque(maxlen=buffer_size)
+        }
 
-# Visualize the fitness over generations
-plt.figure(figsize=(10, 5))
-for i in range(len(fitness_over_time[0])):
-    plt.plot([generation[i] for generation in fitness_over_time], label=f'Individual {i+1}')
-plt.title('Fitness Over Generations')
-plt.xlabel('Generation')
-plt.ylabel('Fitness')
-plt.legend()
-plt.show()
+        self.init_subscribers()
+        Thread(target=self.visualize_data).start()
 
-# Visualize the decisions over generations
-plt.figure(figsize=(10, 5))
-for generation in range(len(decisions_over_time)):
-    for decision in set(decisions_over_time[0]):
-        plt.bar(generation, [dec.count(decision) for dec in decisions_over_time], label=f'Decision: {decision}')
-plt.title('Decision Counts Over Generations')
-plt.xlabel('Generation')
-plt.ylabel('Count')
-plt.legend()
-plt.show()
+    def init_subscribers(self):
+        rospy.Subscriber('/fitness_data', Float32MultiArray, self.data_callback, callback_args='fitness')
+        rospy.Subscriber('/energy_data', Float32MultiArray, self.data_callback, callback_args='energy')
+        rospy.Subscriber('/health_data', Float32MultiArray, self.data_callback, callback_args='health')
+        rospy.Subscriber('/decision_data', Float32MultiArray, self.data_callback, callback_args='decision')
+
+    def data_callback(self, data, data_type):
+        self.data_buffers[data_type].append(data.data)
+
+    def visualize_data(self):
+        plt.ion()
+        fig, axs = plt.subplots(4, 1, figsize=(12, 10))
+        plot_titles = ['Fitness Over Time', 'Energy Levels Over Time', 'Health Scores Over Time', 'Decision Patterns Over Time']
+        data_types = ['fitness', 'energy', 'health', 'decision']
+
+        while not rospy.is_shutdown():
+            for i, data_type in enumerate(data_types):
+                if self.data_buffers[data_type]:
+                    axs[i].clear()
+                    axs[i].plot(np.array(self.data_buffers[data_type]), label=data_type.capitalize())
+                    axs[i].set_title(plot_titles[i])
+
+            plt.pause(0.1)
+
+        plt.ioff()
+        plt.show()
+
+if __name__ == '__main__':
+    visualizer = PerformanceVisualizer()
+    rospy.spin()
