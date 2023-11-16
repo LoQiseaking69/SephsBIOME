@@ -6,8 +6,19 @@ cleanup_and_exit() {
     exit $1
 }
 
+# Function to check Python version
+check_python_version() {
+    PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
+    REQUIRED_VERSION="3.6"
+    if [[ $(echo -e "$PYTHON_VERSION\n$REQUIRED_VERSION" | sort -V | head -n1) != "$REQUIRED_VERSION" ]]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
 # Check for Python 3.6 or newer
-if ! command -v python3 &> /dev/null || [[ $(python3 -c 'import sys; print(sys.version_info.major)') -lt 3 ]] || [[ $(python3 -c 'import sys; print(sys.version_info.minor)') -lt 6 ]]; then
+if ! command -v python3 &> /dev/null || ! check_python_version; then
     echo "Python 3.6 or newer is required and could not be found."
     exit 1
 fi
@@ -25,6 +36,12 @@ python3 -m venv sephsbiome-env || { echo "Failed to create virtual environment."
 # Activate the virtual environment
 echo "Activating the virtual environment..."
 source sephsbiome-env/bin/activate || { echo "Failed to activate virtual environment."; cleanup_and_exit 1; }
+
+# Check for requirements.txt file
+if [ ! -f requirements.txt ]; then
+    echo "requirements.txt file not found."
+    cleanup_and_exit 1
+fi
 
 # Install requirements
 echo "Installing requirements from requirements.txt..."
