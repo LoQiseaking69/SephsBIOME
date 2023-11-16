@@ -1,69 +1,39 @@
+# Seph's Biome: Advanced Bipedal Robot Evolution Simulator
 
-# Digital Biome for ROS/RTOS Integration in Bipedal Robot
+## Project Overview
+Seph's Biome is an innovative simulation platform focused on the evolution and analysis of bipedal robotic behaviors within a digitally simulated environment. This project combines neural networks, genetic algorithms, and advanced sensor data processing to develop adaptive and dynamic behaviors in bipedal robots.
 
-## Overview
-This project implements a digital biome for a bipedal robot, creating an adaptive and interactive environment for robotic systems. Utilizing neural networks for decision-making and genetic algorithms for evolutionary processes, the project facilitates the integration of ROS/RTOS systems for complex robotic behaviors. The simulation environment processes sensor data to emulate real-world interactions.
-
-## Project Structure
-
-### Python Scripts
-
-#### `neural_network.py`
-   - Implements a neural network model for decision-making.
-   - Used by the simulation individuals based on sensor input.
-
-#### `sensor_data.py`
-   - Handles acquisition and processing of sensor data.
-   - Provides sensor input to the individuals simulating environmental interactions.
-
-#### `individual.py`
-   - Defines the `Individual` class for entities within the biome.
-   - Represents entities that interact, make decisions, and evolve within the simulation.
-
-#### `simulator.py`
-   - Coordinates the simulation environment and evolutionary process.
-   - Manages the lifecycle and evolution of individuals in the digital biome.
-
-#### `genome.py`
-   - Manages genetic information for the simulation individuals.
-   - Influences behaviors and characteristics through genetic algorithms.
-
-#### `bipedal_robot.py`
-   - Simulates the physical aspects and behaviors of a bipedal robot.
-   - Acts as the primary agent within the simulation, reacting and adapting to the biome.
-
-#### `evolution.py`
-   - Manages the genetic algorithm loop for evolutionary simulation.
-   - Executes the evolution of individuals through selection, reproduction, and mutation.
-
-#### `requirements.txt`
-   - Lists the dependencies required for the simulation.
-
-#### `setup_sephsbiome.sh`
-   - Bash script for setting up the Python environment, including virtual environment creation and dependency installation.
-
-## Usage
-To set up and run the simulation:
-
-1. Ensure Python 3.x is installed.
-2. Execute the setup script to create a virtual environment and install dependencies:
-   ```bash
-   ./setup_sephsbiome.sh
-   ```
-3. Run the simulation using the `simulator.py` script:
-   ```bash
-   python simulator.py
-   ```
+## Installation and Setup
+To set up Seph's Biome, follow these steps:
+1. Clone the repository to your local machine.
+2. Run the `setup_sephsbiome.sh` script. This script will set up a Python virtual environment, install necessary dependencies, and perform initial configuration.
+3. Ensure that ROS (Robot Operating System) is installed and configured on your machine, as the project relies on ROS for managing robot simulations and sensor data.
 
 ## Dependencies
-Ensure the following dependencies are installed:
+The project requires the following Python libraries:
+- Numpy
+- Matplotlib
+- TensorFlow
 
-- Python 3.x
-- TensorFlow (version as per `requirements.txt`)
-- NumPy (version as per `requirements.txt`)
+Version specifics can be found in `requirements.txt`.
 
-Install all dependencies using `pip` within the virtual environment:
+## Key Components
+- **Main Module (`main.py`)**: Serves as the entry point, integrating components such as the simulator and the evolutionary process.
+- **Bipedal Robot (`bipedal_robot.py`)**: Manages the simulation of the bipedal robot's behavior and interactions within the biome. Utilizes ROS for communication and control.
+- **Evolution (`evolution.py`)**: Handles evolutionary algorithms, including selection, mutation, and fitness evaluation.
+- **Genome (`genome.py`)**: Manages genetic information and mutations for the evolutionary process.
+- **Individual (`individual.py`)**: Represents an individual entity in the simulation.
+- **Neural Network (`neural_network.py`)**: Manages the neural network architecture for decision-making processes.
+- **Performance Visualization (`performanceViz.py`)**: Provides visualization tools for analyzing the performance and outcomes of the simulation.
+- **Sensor Data (`sensor_data.py`)**: Processes and interprets sensor data from the simulated environment. Interfaces with ROS for real-time data handling.
+- **Simulator (`simulator.py`)**: Orchestrates the overall simulation environment, managing entities and simulation cycles.
 
-```bash
-pip install -r requirements.txt
-```
+## Running the Simulation
+To run Seph's Biome:
+1. Ensure all dependencies, including ROS, are properly installed.
+2. Execute `main.py` to start the simulation.
+3. Monitor the simulation's progress and performance through the visualizations provided by `performanceViz.py`.
+
+## License
+Seph's Biome is licensed under the MPL 2.0 License. For more details, refer to the `MPL_2_0_License.md` file.
+
