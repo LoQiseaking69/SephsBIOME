@@ -1,13 +1,15 @@
 import numpy as np
 from individual import Individual
 from genome import Genome
-from sensor_data import SensorDataHandler  # Import the updated SensorDataHandler
+from sensor_data import SensorDataHandler
 
 class Simulator:
-    def __init__(self, population_size):
+    def __init__(self, population_size, seq_length, d_model):
         self.population_size = population_size
-        self.population = [Individual(Genome(), seq_length=10, d_model=32) for _ in range(population_size)]
+        self.seq_length = seq_length
+        self.d_model = d_model
         self.sensor_handler = SensorDataHandler()  # Initialize sensor data handler
+        self.population = [Individual(Genome(), seq_length, d_model) for _ in range(population_size)]
 
     def select_parents(self):
         fitness_scores = [individual.fitness for individual in self.population]
@@ -20,7 +22,7 @@ class Simulator:
 
     def crossover(self, parent1, parent2):
         child_genome = parent1.genome.crossover(parent2.genome)
-        return Individual(child_genome, seq_length=10, d_model=32)
+        return Individual(child_genome, self.seq_length, self.d_model)
 
     def mutate(self, individual):
         individual.genome.mutate(mutation_rate=0.1)
@@ -43,10 +45,10 @@ class Simulator:
             print(f"Running Generation {generation + 1}")
 
             for individual in self.population:
-                sensor_data = self.sensor_handler.get_sensor_data()  # Retrieve real sensor data
+                sensor_data = self.sensor_handler.get_sensor_data()
                 processed_data = individual.process_sensor_data(sensor_data)
                 decision, reward = individual.make_decision(processed_data)
-                individual.interact_with_robot(decision)  # Needs to be adapted for real robot control
+                individual.execute_decision(decision)
                 individual.evaluate_fitness(reward)
 
             generation_fitness = [individual.fitness for individual in self.population]
