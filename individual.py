@@ -1,6 +1,6 @@
 import rospy
 from std_msgs.msg import String
-from sensor_msgs.msg import Image  # Adjust based on your sensor type
+from sensor_msgs.msg import Image
 import numpy as np
 from neural_network import create_neural_network_model
 from genome import Genome
@@ -22,6 +22,7 @@ class Individual:
         self.control_publisher = rospy.Publisher("/control_command", String, queue_size=10)
 
     def sensor_data_callback(self, data):
+        # Convert the received data and process
         sensor_data = self.convert_ros_to_numpy(data)
         processed_data = self.process_sensor_data(sensor_data)
         decision, reward = self.make_decision(processed_data)
@@ -35,7 +36,7 @@ class Individual:
         return image_data
 
     def process_sensor_data(self, sensor_data):
-        # Process sensor data influenced by genome
+        # Incorporate genome influence in sensor data processing
         genome_influence = self.process_genes_for_sensor_data()
         processed_data = np.tanh(sensor_data.flatten() + genome_influence)
         processed_data = np.expand_dims(processed_data, axis=0)
@@ -48,7 +49,7 @@ class Individual:
         return sensor_processing_value + kinematic_influence
 
     def make_decision(self, processed_sensor_data):
-        # Make a decision based on processed sensor data
+        # Use neural network model to make a decision
         prediction = self.neural_network_model.predict(processed_sensor_data)
         decision = prediction[0][0]
         reward = prediction[1][0]
@@ -57,12 +58,12 @@ class Individual:
         return decision, reward
 
     def execute_decision(self, decision):
-        # Translate decision into a robot control command and publish
+        # Translate decision to a robot control command
         command = self.translate_decision_to_command(decision)
         self.control_publisher.publish(String(command))
 
     def translate_decision_to_command(self, decision):
-        # Map the decision to specific robot control commands
+        # Map decision to specific robot control commands
         if decision < 0.2:
             return "INCREASE_SPEED"
         elif decision < 0.4:
@@ -75,7 +76,7 @@ class Individual:
             return "STOP"
 
     def evaluate_fitness(self, reward):
-        # Evaluate fitness based on various factors including reward
+        # Evaluate fitness based on multiple factors
         stability_score = self.calculate_stability()
         agility_score = self.calculate_agility()
         kinematic_efficiency = self.calculate_kinematic_efficiency()
@@ -84,25 +85,19 @@ class Individual:
     def calculate_stability(self):
         # Calculate stability score from genome
         stability_genes = [gene for gene in self.genome.genes if gene.sink_type == 'stability']
-        if not stability_genes:
-            return 0
-        return np.mean([gene.weight for gene in stability_genes]) * 10
+        return np.mean([gene.weight for gene in stability_genes]) * 10 if stability_genes else 0
 
     def calculate_agility(self):
         # Calculate agility score from genome
         agility_genes = [gene for gene in self.genome.genes if gene.sink_type == 'agility']
-        if not agility_genes:
-            return 0
-        return np.mean([gene.weight for gene in agility_genes]) * 10
+        return np.mean([gene.weight for gene in agility_genes]) * 10 if agility_genes else 0
 
     def calculate_kinematic_efficiency(self):
         # Calculate kinematic efficiency from genome
-        efficiency_genes = [gene for gene in self.genome.genes if gene.source_type in ['efficiency']]
-        if not efficiency_genes:
-            return 0
-        return np.mean([gene.kinematic_trait for gene in efficiency_genes]) * 20
+        efficiency_genes = [gene for gene in self.genome.genes if gene.source_type == 'efficiency']
+        return np.mean([gene.kinematic_trait for gene in efficiency_genes]) * 20 if efficiency_genes else 0
 
-# Usage example (within a ROS environment):
+# Example usage (within a ROS environment):
 # genome = Genome()  # Assuming Genome() is properly defined
 # individual = Individual(genome, seq_length=10, d_model=32)
 # rospy.spin()  # Keep the ROS node running
