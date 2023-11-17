@@ -1,8 +1,9 @@
 import rospy
 from std_msgs.msg import String
-from sensor_msgs.msg import Image  # Assuming the use of Image data; adjust as needed
+from sensor_msgs.msg import Image  # Adjust based on your sensor type
 import numpy as np
 from neural_network import create_neural_network_model
+from genome import Genome
 
 class Individual:
     def __init__(self, genome, seq_length, d_model):
@@ -16,6 +17,7 @@ class Individual:
         self.decision_log = []
         self.reward_log = []
 
+        # ROS subscribers and publishers
         self.sensor_data_subscriber = rospy.Subscriber("/sensor_data", Image, self.sensor_data_callback)
         self.control_publisher = rospy.Publisher("/control_command", String, queue_size=10)
 
@@ -27,23 +29,26 @@ class Individual:
         self.evaluate_fitness(reward)
 
     def convert_ros_to_numpy(self, data):
-        # Convert ROS sensor data (Image) to numpy array; adjust based on your sensor type
+        # Convert ROS Image data to numpy array
         image_data = np.frombuffer(data.data, dtype=np.uint8)
         image_data = image_data.reshape((data.height, data.width, -1))
         return image_data
 
     def process_sensor_data(self, sensor_data):
+        # Process sensor data influenced by genome
         genome_influence = self.process_genes_for_sensor_data()
         processed_data = np.tanh(sensor_data.flatten() + genome_influence)
         processed_data = np.expand_dims(processed_data, axis=0)
         return processed_data
 
     def process_genes_for_sensor_data(self):
+        # Calculate influence from genome on sensor data processing
         sensor_processing_value = sum(gene.weight for gene in self.genome.genes if gene.source_type == 'sensor')
         kinematic_influence = sum(gene.kinematic_trait for gene in self.genome.genes)
         return sensor_processing_value + kinematic_influence
 
     def make_decision(self, processed_sensor_data):
+        # Make a decision based on processed sensor data
         prediction = self.neural_network_model.predict(processed_sensor_data)
         decision = prediction[0][0]
         reward = prediction[1][0]
@@ -52,11 +57,12 @@ class Individual:
         return decision, reward
 
     def execute_decision(self, decision):
+        # Translate decision into a robot control command and publish
         command = self.translate_decision_to_command(decision)
         self.control_publisher.publish(String(command))
 
     def translate_decision_to_command(self, decision):
-        # Translate the decision into a specific robot control command
+        # Map the decision to specific robot control commands
         if decision < 0.2:
             return "INCREASE_SPEED"
         elif decision < 0.4:
@@ -69,24 +75,28 @@ class Individual:
             return "STOP"
 
     def evaluate_fitness(self, reward):
+        # Evaluate fitness based on various factors including reward
         stability_score = self.calculate_stability()
         agility_score = self.calculate_agility()
         kinematic_efficiency = self.calculate_kinematic_efficiency()
         self.fitness = self.energy + self.health + reward + stability_score + agility_score + kinematic_efficiency
 
     def calculate_stability(self):
+        # Calculate stability score from genome
         stability_genes = [gene for gene in self.genome.genes if gene.sink_type == 'stability']
         if not stability_genes:
             return 0
         return np.mean([gene.weight for gene in stability_genes]) * 10
 
     def calculate_agility(self):
+        # Calculate agility score from genome
         agility_genes = [gene for gene in self.genome.genes if gene.sink_type == 'agility']
         if not agility_genes:
             return 0
         return np.mean([gene.weight for gene in agility_genes]) * 10
 
     def calculate_kinematic_efficiency(self):
+        # Calculate kinematic efficiency from genome
         efficiency_genes = [gene for gene in self.genome.genes if gene.source_type in ['efficiency']]
         if not efficiency_genes:
             return 0
