@@ -3,8 +3,11 @@ import rospy
 
 class BipedalRobot:
     def __init__(self):
-        # Initialize the ROS node
-        rospy.init_node('bipedal_robot_node', anonymous=True)
+        try:
+            # Initialize the ROS node
+            rospy.init_node('bipedal_robot_node', anonymous=True)
+        except rospy.ROSInitException as e:
+            rospy.logerr(f"ROS Init Exception: {e}")
 
         # Robot attributes
         self.computation_power = 100  # Initial computation power
@@ -13,8 +16,11 @@ class BipedalRobot:
         self.energy_level = 100  # Energy level, affecting performance
 
         # ROS publishers and subscribers
-        self.status_publisher = rospy.Publisher('/robot_status', String, queue_size=10)
-        self.energy_subscriber = rospy.Subscriber('/energy_update', Float64, self.energy_update_callback)
+        try:
+            self.status_publisher = rospy.Publisher('/robot_status', String, queue_size=10)
+            self.energy_subscriber = rospy.Subscriber('/energy_update', Float64, self.energy_update_callback)
+        except rospy.ROSException as e:
+            rospy.logerr(f"ROS Communication Exception: {e}")
 
     def energy_update_callback(self, data):
         # Update the energy level based on data received from a ROS topic
@@ -30,9 +36,9 @@ class BipedalRobot:
 
     def apply_assistance(self, individual):
         # Apply assistance based on individual's capabilities and robot's current state
-        self.computation_power += individual.assist_computation()
-        self.mobility += individual.assist_mobility()
-        self.learning_ability += individual.assist_learning()
+        self.computation_power += self.calculate_boost(individual.assist_computation(), self.computation_power)
+        self.mobility += self.calculate_boost(individual.assist_mobility(), self.mobility)
+        self.learning_ability += self.calculate_boost(individual.assist_learning(), self.learning_ability)
 
     def calculate_boost(self, assistance_value, current_value):
         # Calculate the boost value based on current capability and assistance
