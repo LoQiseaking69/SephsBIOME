@@ -6,36 +6,44 @@ cleanup_and_exit() {
     exit $1
 }
 
-# Function to check Python version
+# Function to check Python version supporting a range of versions
 check_python_version() {
     PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
-    REQUIRED_VERSION="3.8"  # Update to the specific Python version required
-    if [[ $(echo -e "$PYTHON_VERSION\n$REQUIRED_VERSION" | sort -V | head -n1) != "$REQUIRED_VERSION" ]]; then
+    MIN_REQUIRED_VERSION="3.8"  # Minimum Python version required
+    MAX_REQUIRED_VERSION="3.9"  # Maximum Python version supported
+
+    if [[ $(echo -e "$PYTHON_VERSION\n$MIN_REQUIRED_VERSION" | sort -V | head -n1) != "$MIN_REQUIRED_VERSION" ]] || \
+       [[ $(echo -e "$PYTHON_VERSION\n$MAX_REQUIRED_VERSION" | sort -V | tail -n1) != "$MAX_REQUIRED_VERSION" ]]; then
+        echo "Python version between $MIN_REQUIRED_VERSION and $MAX_REQUIRED_VERSION is required."
         return 1
     else
         return 0
     fi
 }
 
-# Function to check if ROS is installed
+# Function to check if ROS is installed and the correct version
 check_ros_installation() {
     if ! command -v roscore &> /dev/null; then
         echo "ROS is not installed. Please install ROS to continue."
         exit 1
     fi
+
+    # Optionally, check for a specific ROS version here
 }
 
 # Function to install system dependencies
 install_system_dependencies() {
     echo "This script will install system dependencies required for the project."
-    echo "This includes packages such as <list-of-packages>."
+    echo "This includes ROS, TensorFlow, and other necessary packages."
     read -p "Do you want to proceed with installing these packages? (y/n) " -n 1 -r
     echo  # move to a new line
 
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "Installing system dependencies..."
         sudo apt-get update
-        sudo apt-get install -y <list-of-packages>  # Replace <list-of-packages> with actual package names
+        sudo apt-get install -y python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential
+        sudo rosdep init
+        rosdep update
     else
         echo "System dependencies installation skipped. Exiting script."
         exit 1
@@ -45,9 +53,9 @@ install_system_dependencies() {
 # Check and prompt for system-level dependencies installation
 install_system_dependencies
 
-# Check for Python 3.8 or the specific version required
+# Check for Python 3.8 or 3.9
 if ! command -v python3 &> /dev/null || ! check_python_version; then
-    echo "Python $REQUIRED_VERSION or newer is required and could not be found."
+    echo "Python 3.8 or 3.9 is required and could not be found."
     exit 1
 fi
 
@@ -57,7 +65,7 @@ if ! command -v pip &> /dev/null; then
     exit 1
 fi
 
-# Check for ROS installation
+# Check for ROS installation and version
 check_ros_installation
 
 # Create a Python virtual environment in the 'env' directory
