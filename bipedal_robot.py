@@ -14,6 +14,7 @@ class BipedalRobot:
         self.mobility = 100  # Initial mobility
         self.learning_ability = 100  # Initial learning ability
         self.energy_level = 100  # Energy level, affecting performance
+        self.max_capacity = 200  # Maximum capacity for attributes
 
         # ROS publishers and subscribers
         try:
@@ -24,8 +25,15 @@ class BipedalRobot:
 
     def energy_update_callback(self, data):
         # Update the energy level based on data received from a ROS topic
-        self.energy_level = data.data
-        rospy.loginfo(f"Updated energy level: {self.energy_level}")
+        try:
+            new_energy_level = float(data.data)
+            if 0 <= new_energy_level <= self.max_capacity:
+                self.energy_level = new_energy_level
+                rospy.loginfo(f"Updated energy level: {self.energy_level}")
+            else:
+                rospy.logwarn("Received invalid energy level update")
+        except (ValueError, TypeError) as e:
+            rospy.logerr(f"Invalid data type in energy update: {e}")
 
     def receive_assistance(self, individual):
         if self.energy_level > 0:
@@ -36,15 +44,14 @@ class BipedalRobot:
 
     def apply_assistance(self, individual):
         # Apply assistance based on individual's capabilities and robot's current state
-        self.computation_power += self.calculate_boost(individual.assist_computation(), self.computation_power)
-        self.mobility += self.calculate_boost(individual.assist_mobility(), self.mobility)
-        self.learning_ability += self.calculate_boost(individual.assist_learning(), self.learning_ability)
+        self.computation_power = min(self.computation_power + self.calculate_boost(individual.assist_computation(), self.computation_power), self.max_capacity)
+        self.mobility = min(self.mobility + self.calculate_boost(individual.assist_mobility(), self.mobility), self.max_capacity)
+        self.learning_ability = min(self.learning_ability + self.calculate_boost(individual.assist_learning(), self.learning_ability), self.max_capacity)
 
     def calculate_boost(self, assistance_value, current_value):
         # Calculate the boost value based on current capability and assistance
-        max_capacity = 200
-        boost = assistance_value * (1 - current_value / max_capacity)
-        return min(boost, max_capacity - current_value)
+        boost = assistance_value * (1 - current_value / self.max_capacity)
+        return boost
 
     def publish_status(self):
         # Publish the robot's status to a ROS topic
