@@ -1,4 +1,4 @@
-# Seph's Biome: Advanced Bipedal Robot Evolution Simulator
+# Seph's Biome: Kinematic Evolution Simulator
 
 ## Project Overview
 Seph's Biome is an innovative simulation platform focused on the evolution and analysis of bipedal robotic behaviors within a digitally simulated environment. This project combines neural networks, genetic algorithms, and advanced sensor data processing to develop adaptive and dynamic behaviors in bipedal robots.
