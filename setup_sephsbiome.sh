@@ -96,5 +96,7 @@ if ! pip install -r $REQUIREMENTS_FILE; then
 fi
 
 echo "Setup complete. Virtual environment '$VENV_DIR' is ready."
-echo "Activate it using 'source $VENV_DIR/bin/activate'."
-echo "To deactivate, simply type 'deactivate'."
+
+# Setup is complete, now running the main program
+echo "Running the main program..."
+python3 main.py
