@@ -1,7 +1,7 @@
 
-# Seph's Biome Project
+# Seph's Biome
 ## Overview
-Seph's Biome is a cutting-edge project focusing on evolving a biome of mechanisms to enhance the kinematic abilities of bipedal robots. This project integrates evolutionary algorithms, neural networks, and sensor data processing to simulate and evolve robotic behaviors.
+Seph's Biome is an attempt at integrating cutting-edge technologies and methodologies focusing on evolving a biome of mechanisms to enhance the kinematic abilities of bipedal robots. This project integrates evolutionary algorithms, neural networks, and sensor data processing to simulate and evolve robotic behaviors.
 
 ## Features
 - **Evolutionary Algorithms**: Utilize genetic algorithms to evolve robot behaviors over generations.
