@@ -1,4 +1,4 @@
-# Use an official Python runtime as a parent image, ensuring compatibility with Python 3.8 or 3.9
+# Use an official Python runtime as a parent image, ensuring compatibility with Python 3.8
 FROM python:3.8-slim
 
 # Set the working directory in the container
@@ -35,6 +35,12 @@ EXPOSE 8000
 
 # Define environment variable
 ENV NAME SephsBiome
+
+# Add an argument to control whether to run setup_sephsbiome.sh
+ARG RUN_SETUP_SCRIPT=false
+
+# Conditional execution of the setup script
+RUN if [ "$RUN_SETUP_SCRIPT" = "true" ] ; then ./setup_sephsbiome.sh ; fi
 
 # Run app.py when the container launches
 CMD ["python3", "./main.py"]
