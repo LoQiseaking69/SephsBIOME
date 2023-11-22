@@ -1,7 +1,7 @@
 
 # Seph's Biome
 ## Overview
-Seph's Biome integrates cutting-edge technologies to evolve kinematic abilities in bipedal robots.
+Seph's Biome aims to integrate cutting-edge technologies and a diverse set of algorythmically advanced methodololgies; to evolve, kinematic abilities in bipedal robots.
 
 ## Features
 - **Evolutionary Algorithms**: Employ genetic algorithms for the progressive evolution of robot behaviors.
@@ -66,4 +66,4 @@ This project is licensed under the MPL 2.0 License - see the LICENSE.md file for
 - Contributors and community members who have contributed to this project.
 - Organizations supporting the research and development of advanced robotics.
 
-For more information, visit our project page.
+For more information, visit our project page. (To be Established)
