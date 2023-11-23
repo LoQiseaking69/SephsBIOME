@@ -19,7 +19,7 @@ Seph's Biome aims to integrate cutting-edge technologies and a diverse set of al
 To set up the project, clone the repository and navigate to its directory:
 
 ```bash
-git clone [repository-link]
+git clone 'https://github.com/LoQiseaking69/SephsBIOME.git'
 cd Sephs-Biome
 ```
 
