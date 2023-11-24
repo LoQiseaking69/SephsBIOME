@@ -20,7 +20,7 @@ To set up the project, clone the repository and navigate to its directory:
 
 ```bash
 git clone 'https://github.com/LoQiseaking69/SephsBIOME.git'
-cd Sephs-Biome
+cd SephsBIOME
 ```
 
 ### Using Docker
