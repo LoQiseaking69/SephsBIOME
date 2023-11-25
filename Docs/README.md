@@ -101,4 +101,3 @@ This project is licensed under the MPL 2.0 License - see the LICENSE.md file for
 
 ## For more information, visit our project page: 
 [The L3C initiative over SephsBIOME](https://gamma.app/public/Welcome-to-HermiTech-L3C-a6ichx7iul82k4b)
-'
