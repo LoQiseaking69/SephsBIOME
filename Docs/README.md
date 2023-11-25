@@ -8,7 +8,9 @@ Seph’s Biome is an innovative project that stands at the intersection of robot
 (https://youtube.com/@davidrandallmiller?si=kAktZ_CpiCddPpU1)
 ‘’’
 
- and the seminal thesis on symbolic Boolean regression by Stephen D’Ascoli (https://sdascoli.github.io/)(DOI:2309.12207). 
+ and the seminal thesis on symbolic Boolean regression by Stephen D’Ascoli (https://sdascoli.github.io/)
+ 
+ (DOI:2309.12207). 
 
 This project embarks on a journey to evolve kinematic abilities in bipedal robots through sophisticated algorithms and neural network modeling.
 
