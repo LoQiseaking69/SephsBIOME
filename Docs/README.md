@@ -54,7 +54,7 @@ After following the setup instructions, the directory structure should look like
 
 and will find the main runtime files within the ./src directory.
 
-![Project Directory Structure](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/IMG_4622.jpg)
+![Project Directory Structure](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/IMG_4617.jpg)
 
 ### Using Docker
 To build and run the project using Docker:
