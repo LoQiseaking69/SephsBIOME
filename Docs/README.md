@@ -2,7 +2,15 @@
 
 ## Overview
 
-Seph’s Biome is an innovative project that stands at the intersection of robotics, computer science, and evolutionary biology. Drawing inspiration and fundamental principles from the bioSim project by David Miller and the seminal thesis on symbolic Boolean regression by Stephen D’Ascoli (DOI:2309.12207), this project embarks on a journey to evolve kinematic abilities in bipedal robots through sophisticated algorithms and neural network modeling.
+Seph’s Biome is an innovative project that stands at the intersection of robotics, computer science, and evolutionary biology. Drawing inspiration and fundamental principles from the bioSim project by David Miller
+
+‘’’
+(https://youtube.com/@davidrandallmiller?si=kAktZ_CpiCddPpU1)
+‘’’
+
+ and the seminal thesis on symbolic Boolean regression by Stephen D’Ascoli (https://sdascoli.github.io/)(DOI:2309.12207). 
+
+This project embarks on a journey to evolve kinematic abilities in bipedal robots through sophisticated algorithms and neural network modeling.
 
 ### Key Aspects:
 
