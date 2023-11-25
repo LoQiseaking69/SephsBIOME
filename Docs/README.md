@@ -2,7 +2,7 @@
 
 ## Overview
 
-Seph’s Biome is an innovative project that stands at the intersection of robotics, computer science, and evolutionary biology. Drawing inspiration and fundamental principles from the bioSim project by David Miller
+Seph’s Biome is an attempt at innovative project that stands at the intersection of robotics, computer science, and evolutionary biology. Drawing inspiration and fundamental principles from the bioSim project by David Miller
 
 ‘’’
 (https://youtube.com/@davidrandallmiller?si=kAktZ_CpiCddPpU1)
