@@ -48,7 +48,7 @@ cd SephsBIOME
 
 After following the setup instructions, the directory structure should look like this:
 
-![Project Directory Structure](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/IMG_4617.jpg)
+![Project Directory Structure](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/IMG_4622.jpg)
 
 
 ### Using Docker
