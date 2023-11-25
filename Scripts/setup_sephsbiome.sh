@@ -1,102 +1,139 @@
 #!/bin/bash
 
-# Function to deactivate virtual environment and exit
-cleanup_and_exit() {
-    deactivate 2>/dev/null
-    exit $1
+# Default configurations
+VENV_DIR_DEFAULT="sephsbiome-env"
+REQUIRED_ROS_VERSION_DEFAULT="noetic"
+MIN_PYTHON_VERSION_DEFAULT="3.8"
+MAX_PYTHON_VERSION_DEFAULT="3.9"
+LOG_FILE="setup_log.txt"
+RETRY_MAX=3
+
+# Parse command-line arguments for configuration
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -v|--venv) VENV_DIR="$2"; shift ;;
+        -r|--ros-version) REQUIRED_ROS_VERSION="$2"; shift ;;
+        -p|--python-min) MIN_PYTHON_VERSION="$2"; shift ;;
+        -P|--python-max) MAX_PYTHON_VERSION="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+# Use default values if not set by arguments
+VENV_DIR=${VENV_DIR:-$VENV_DIR_DEFAULT}
+REQUIRED_ROS_VERSION=${REQUIRED_ROS_VERSION:-$REQUIRED_ROS_VERSION_DEFAULT}
+MIN_PYTHON_VERSION=${MIN_PYTHON_VERSION:-$MIN_PYTHON_VERSION_DEFAULT}
+MAX_PYTHON_VERSION=${MAX_PYTHON_VERSION:-$MAX_PYTHON_VERSION_DEFAULT}
+
+# Start logging
+exec > >(tee "$LOG_FILE") 2>&1
+
+# Function definitions
+print_success() {
+    echo -e "\033[0;32m$1\033[0m"
 }
 
-# Function to check Python version supporting a range of versions
+print_warning() {
+    echo -e "\033[0;33m$1\033[0m"
+}
+
+error_exit() {
+    echo -e "\033[0;31m$1\033[0m" >&2
+    exit 1
+}
+
+confirm_action() {
+    read -p "$1 (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        return 0
+    else
+        print_warning "Action skipped by user."
+        return 1
+    fi
+}
+
+retry() {
+    local n=1
+    until [ "$n" -ge "$RETRY_MAX" ]; do
+        "$@" && break || {
+            if [ "$n" -lt "$RETRY_MAX" ]; then
+                n=$((n+1))
+                print_warning "Attempt $n/$RETRY_MAX failed! Trying again in 5 seconds..."
+                sleep 5
+            else
+                error_exit "The command has failed after $n attempts."
+            fi
+        }
+    done
+}
+
+# Check Python version
 check_python_version() {
     PYTHON_VERSION=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
-    MIN_REQUIRED_VERSION="3.8"  # Minimum Python version required
-    MAX_REQUIRED_VERSION="3.9"  # Maximum Python version supported
-
-    if [[ $(echo -e "$PYTHON_VERSION\n$MIN_REQUIRED_VERSION" | sort -V | head -n1) != "$MIN_REQUIRED_VERSION" ]] || \
-       [[ $(echo -e "$PYTHON_VERSION\n$MAX_REQUIRED_VERSION" | sort -V | tail -n1) != "$MAX_REQUIRED_VERSION" ]]; then
-        echo "Python version between $MIN_REQUIRED_VERSION and $MAX_REQUIRED_VERSION is required."
-        return 1
+    if [[ $(echo -e "$PYTHON_VERSION\n$MIN_PYTHON_VERSION" | sort -V | head -n1) != "$MIN_PYTHON_VERSION" ]] || \
+       [[ $(echo -e "$PYTHON_VERSION\n$MAX_PYTHON_VERSION" | sort -V | tail -n1) != "$MAX_PYTHON_VERSION" ]]; then
+        error_exit "Python version between $MIN_PYTHON_VERSION and $MAX_PYTHON_VERSION is required. Found: $PYTHON_VERSION"
     else
-        return 0
+        print_success "Compatible Python version found: $PYTHON_VERSION"
     fi
 }
 
-# Function to check if ROS is installed and the correct version
+# Check ROS installation
 check_ros_installation() {
     if ! command -v roscore &> /dev/null; then
-        echo "ROS is not installed. Please install ROS to continue."
-        exit 1
+        error_exit "ROS is not installed. Please install ROS to continue."
+    else
+        INSTALLED_ROS_VERSION=$(rosversion -d)
+        if [ "$INSTALLED_ROS_VERSION" != "$REQUIRED_ROS_VERSION" ]; then
+            error_exit "ROS $REQUIRED_ROS_VERSION is required. Found ROS $INSTALLED_ROS_VERSION."
+        else
+            print_success "Correct ROS version found: $INSTALLED_ROS_VERSION"
+        fi
     fi
-
-    # Optionally, check for a specific ROS version here
 }
 
-# Function to install system dependencies
+# Install system dependencies
 install_system_dependencies() {
-    echo "This script will install system dependencies required for the project."
-    echo "This includes ROS, TensorFlow, and other necessary packages."
-    read -p "Do you want to proceed with installing these packages? (y/n) " -n 1 -r
-    echo  # move to a new line
-
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "Installing system dependencies..."
-        sudo apt-get update
-        sudo apt-get install -y python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential
+    if confirm_action "Install system dependencies required for the project?"; then
+        DEPENDENCIES="python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential"
+        retry sudo apt-get update
+        retry sudo apt-get install -y $DEPENDENCIES
         sudo rosdep init
         rosdep update
-    else
-        echo "System dependencies installation skipped. Exiting script."
-        exit 1
+        sudo apt-get clean
+        sudo rm -rf /var/lib/apt/lists/*
+        print_success "System dependencies installed successfully."
     fi
 }
 
-# Check and prompt for system-level dependencies installation
-install_system_dependencies
+# Install Python dependencies
+install_python_dependencies() {
+    if confirm_action "Create a virtual environment and install Python dependencies?"; then
+        if [ -d "$VENV_DIR" ]; then
+            print_warning "Virtual environment $VENV_DIR already exists. Skipping creation."
+        else
+            python3 -m venv $VENV_DIR || error_exit "Failed to create virtual environment."
+        fi
 
-# Check for Python 3.8 or 3.9
-if ! command -v python3 &> /dev/null || ! check_python_version; then
-    echo "Python 3.8 or 3.9 is required and could not be found."
-    exit 1
-fi
+        source $VENV_DIR/bin/activate || error_exit "Failed to activate virtual environment."
+        retry pip install --upgrade pip
 
-# Check for pip
-if ! command -v pip &> /dev/null; then
-    echo "pip could not be found. Ensure it is installed and in your PATH."
-    exit 1
-fi
+        REQUIREMENTS_FILE="requirements.txt"
+        if [ ! -f "$REQUIREMENTS_FILE" ]; then
+            error_exit "$REQUIREMENTS_FILE not found in the project directory."
+        fi
 
-# Check for ROS installation and version
+        retry pip install -r $REQUIREMENTS_FILE
+        print_success "Python dependencies installed successfully."
+    fi
+}
+
+# Main execution
+check_python_version
 check_ros_installation
+install_system_dependencies
+install_python_dependencies
 
-# Create a Python virtual environment in the 'env' directory
-VENV_DIR="sephsbiome-env"
-echo "Creating Python virtual environment '$VENV_DIR'..."
-python3 -m venv $VENV_DIR || { echo "Failed to create virtual environment."; exit 1; }
-
-# Activate the virtual environment
-echo "Activating the virtual environment..."
-source $VENV_DIR/bin/activate || { echo "Failed to activate virtual environment."; cleanup_and_exit 1; }
-
-# Upgrade pip in the virtual environment
-echo "Upgrading pip..."
-pip install --upgrade pip
-
-# Check for requirements.txt file in the project directory
-REQUIREMENTS_FILE="requirements.txt"
-if [ ! -f $REQUIREMENTS_FILE ]; then
-    echo "$REQUIREMENTS_FILE file not found in the project directory."
-    cleanup_and_exit 1
-fi
-
-# Install requirements
-echo "Installing requirements from $REQUIREMENTS_FILE..."
-if ! pip install -r $REQUIREMENTS_FILE; then
-    echo "Failed to install requirements."
-    cleanup_and_exit 1
-fi
-
-echo "Setup complete. Virtual environment '$VENV_DIR' is ready."
-
-# Setup is complete, now running the main program
-echo "Running the main program..."
-python3 main.py
+print_success "Setup complete. Virtual environment '$VENV_DIR' is ready to use."
