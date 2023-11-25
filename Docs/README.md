@@ -99,5 +99,6 @@ This project is licensed under the MPL 2.0 License - see the LICENSE.md file for
 - Contributors and community members who have contributed to this project.
 - Organizations supporting the research and development of advanced robotics.
 
-# For more information, visit our project page: 
-(https://gamma.app/public/Welcome-to-HermiTech-L3C-a6ichx7iul82k4b)https://gamma.app/public/Welcome-to-HermiTech-L3C-a6ichx7iul82k4b)
+## For more information, visit our project page: 
+[The L3C initiative over SephsBIOME](https://gamma.app/public/Welcome-to-HermiTech-L3C-a6ichx7iul82k4b)
+'
