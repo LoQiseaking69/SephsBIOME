@@ -1,92 +1,91 @@
-#!/usr/bin/env python
 import rospy
 import numpy as np
 from sensor_msgs.msg import Imu, JointState  
-from geometry_msgs.msg import Twist
-from std_msgs.msg import Header
 from datetime import datetime
-import os
 
 class SensorDataHandler():
-
     def __init__(self):
-        # Get parameters
         self._parse_parameters()
-        
-        # Init ros node 
         rospy.init_node(self._node_name, anonymous=True)
-        
-        # Setup pubs & subs
         self._init_pubs_and_subs()
-
-        # Init class vars
-        self.data = {}        
+        self.data = {}
         self.sensor_data = None
         self.last_update = None
 
-        # Load configs 
         if self._use_sim:
             rospy.loginfo("RUNNING IN SIMULATION MODE")
             self._load_simulator_configuration()
 
         rospy.loginfo("Sensor data handler initialized")
-        
 
     def _parse_parameters(self):
-        # Get parameters from param server
-
-        self._sensor_config_path = rospy.get_param('/config_path', '') 
-        self._sensor_frame_rate = rospy.get_param('/sensor_frame_rate', 50)  
+        self._sensor_config_path = rospy.get_param('/config_path', '')
+        self._sensor_frame_rate = rospy.get_param('/sensor_frame_rate', 50)
         self._node_name = rospy.get_param('/node_name', 'sensor_data_handler')
-        self._use_sim = rospy.get_param('/use_sim', False) 
-
+        self._use_sim = rospy.get_param('/use_sim', False)
 
     def _init_pubs_and_subs(self):
-        # Pub/sub handlers
-        self._imu_sub = rospy.Subscriber("/robot/sensors/imu", Imu, self._imu_callback)  
+        self._imu_sub = rospy.Subscriber("/robot/sensors/imu", Imu, self._imu_callback)
         self._joint_state_sub = rospy.Subscriber("/robot/joint_states", JointState, self._joint_state_callback)
 
-    
     def _imu_callback(self, data):
-        # Handler for imu data  
-        self.data[data.header.frame_id] = (data, datetime.now()) 
-
+        self.data['imu'] = data
 
     def _joint_state_callback(self, data):
-        # Handle joint state data
-        self.data[data.header.frame_id] = (data, datetime.now())
-
+        self.data['joint_states'] = data
 
     def get_latest_sensor_data(self):
-        
-        now = datetime.now()        
-        while any([x is None for x in self.data.values()]) and (now - self.last_update).seconds < (1.0/self._sensor_frame_rate):
-            rospy.sleep(0.1) 
+        now = datetime.now()
+        while 'imu' not in self.data or 'joint_states' not in self.data:
+            rospy.sleep(0.1)
+            if (now - self.last_update).seconds >= (1.0 / self._sensor_frame_rate):
+                break
 
-        if self.data:
-            latest_stamp = max([x[1] for x in self.data.values()])
-            for k in self.data:
-                t = self.data[k]
-                if abs(latest_stamp-t[1]) < rospy.Duration(1.0/self._sensor_frame_rate):  
-                    self.sensor_data = self._merge_sensor_data(self.sensor_data, self.data[k][0] )
-
+        if 'imu' in self.data and 'joint_states' in self.data:
+            self.sensor_data = self._merge_sensor_data(self.sensor_data, self.data)
             self.last_update = datetime.now()
-        
+
         return self.sensor_data
 
-
     def _load_simulator_configuration(self):
-        # If running in simulator mode, configure simulator here 
-        pass
-
+        pass  # Simulator configuration logic
 
     def _merge_sensor_data(self, cur_data, new_data):
-        # Merge new sensor data appropriately
         if not cur_data:
-            return new_data 
+            return new_data
         else:
-            # TODO - add sensor data merge handling/calibration 
-            return cur_data
+            return {
+                'imu': self._merge_imu_data(cur_data.get('imu'), new_data['imu']),
+                'joint_states': self._merge_joint_state_data(cur_data.get('joint_states'), new_data['joint_states'])
+            }
+
+    def _merge_imu_data(self, cur_imu, new_imu):
+        if not cur_imu:
+            return new_imu
+        merged_imu = Imu()
+        merged_imu.header.stamp = rospy.Time.now()
+        merged_imu.linear_acceleration.x = np.mean([cur_imu.linear_acceleration.x, new_imu.linear_acceleration.x])
+        merged_imu.linear_acceleration.y = np.mean([cur_imu.linear_acceleration.y, new_imu.linear_acceleration.y])
+        merged_imu.linear_acceleration.z = np.mean([cur_imu.linear_acceleration.z, new_imu.linear_acceleration.z])
+        merged_imu.angular_velocity.x = np.mean([cur_imu.angular_velocity.x, new_imu.angular_velocity.x])
+        merged_imu.angular_velocity.y = np.mean([cur_imu.angular_velocity.y, new_imu.angular_velocity.y])
+        merged_imu.angular_velocity.z = np.mean([cur_imu.angular_velocity.z, new_imu.angular_velocity.z])
+        return merged_imu
+
+    def _merge_joint_state_data(self, cur_joint_states, new_joint_states):
+        if not cur_joint_states:
+            return new_joint_states
+        merged_joint_states = JointState()
+        merged_joint_states.header.stamp = rospy.Time.now()
+        merged_joint_states.position = np.mean([cur_joint_states.position, new_joint_states.position], axis=0)
+        merged_joint_states.velocity = np.mean([cur_joint_states.velocity, new_joint_states.velocity], axis=0)
+        merged_joint_states.effort = np.mean([cur_joint_states.effort, new_joint_states.effort], axis=0)
+        return merged_joint_states
+
+if __name__ == "__main__":
+    node = SensorDataHandler()
+    rospy.spin()
+
 
 
 if __name__ == "__main__":
