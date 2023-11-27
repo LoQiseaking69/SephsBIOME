@@ -1,56 +1,94 @@
+#!/usr/bin/env python
 import rospy
 import numpy as np
-from sensor_msgs.msg import Imu, JointState
+from sensor_msgs.msg import Imu, JointState  
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Header
+from datetime import datetime
+import os
 
-class SensorDataHandler:
+class SensorDataHandler():
+
     def __init__(self):
-        # Initialize the ROS node
-        rospy.init_node('sensor_data_handler', anonymous=True)
+        # Get parameters
+        self._parse_parameters()
+        
+        # Init ros node 
+        rospy.init_node(self._node_name, anonymous=True)
+        
+        # Setup pubs & subs
+        self._init_pubs_and_subs()
 
-        # Subscribe to sensor topics
-        rospy.Subscriber("/imu/data", Imu, self.imu_callback)
-        rospy.Subscriber("/joint_states", JointState, self.joint_state_callback)
+        # Init class vars
+        self.data = {}        
+        self.sensor_data = None
+        self.last_update = None
 
-        # Initialize variables to store sensor data
-        self.imu_data = None
-        self.joint_states = None
+        # Load configs 
+        if self._use_sim:
+            rospy.loginfo("RUNNING IN SIMULATION MODE")
+            self._load_simulator_configuration()
 
-    def imu_callback(self, data):
-        # Callback function for IMU data
-        self.imu_data = data
+        rospy.loginfo("Sensor data handler initialized")
+        
 
-    def joint_state_callback(self, data):
-        # Callback function for joint state data
-        self.joint_states = data
+    def _parse_parameters(self):
+        # Get parameters from param server
 
-    def get_sensor_data(self):
-        # Wait for the first set of data to be available
-        while self.imu_data is None or self.joint_states is None:
-            rospy.sleep(0.1)
+        self._sensor_config_path = rospy.get_param('/config_path', '') 
+        self._sensor_frame_rate = rospy.get_param('/sensor_frame_rate', 50)  
+        self._node_name = rospy.get_param('/node_name', 'sensor_data_handler')
+        self._use_sim = rospy.get_param('/use_sim', False) 
 
-        # Process and return sensor data
-        # You can modify this part based on what data you need
-        imu_array = np.array([self.imu_data.linear_acceleration.x,
-                              self.imu_data.linear_acceleration.y,
-                              self.imu_data.linear_acceleration.z,
-                              self.imu_data.angular_velocity.x,
-                              self.imu_data.angular_velocity.y,
-                              self.imu_data.angular_velocity.z])
 
-        joint_angles = np.array(self.joint_states.position)
-        sensor_data = np.concatenate((imu_array, joint_angles))
-        return sensor_data
+    def _init_pubs_and_subs(self):
+        # Pub/sub handlers
+        self._imu_sub = rospy.Subscriber("/robot/sensors/imu", Imu, self._imu_callback)  
+        self._joint_state_sub = rospy.Subscriber("/robot/joint_states", JointState, self._joint_state_callback)
 
-def process_sensor_data(sensor_data):
-    # Process sensor data
-    # Modify this function as per your requirements
-    processed_data = np.tanh(sensor_data)
-    return processed_data
+    
+    def _imu_callback(self, data):
+        # Handler for imu data  
+        self.data[data.header.frame_id] = (data, datetime.now()) 
+
+
+    def _joint_state_callback(self, data):
+        # Handle joint state data
+        self.data[data.header.frame_id] = (data, datetime.now())
+
+
+    def get_latest_sensor_data(self):
+        
+        now = datetime.now()        
+        while any([x is None for x in self.data.values()]) and (now - self.last_update).seconds < (1.0/self._sensor_frame_rate):
+            rospy.sleep(0.1) 
+
+        if self.data:
+            latest_stamp = max([x[1] for x in self.data.values()])
+            for k in self.data:
+                t = self.data[k]
+                if abs(latest_stamp-t[1]) < rospy.Duration(1.0/self._sensor_frame_rate):  
+                    self.sensor_data = self._merge_sensor_data(self.sensor_data, self.data[k][0] )
+
+            self.last_update = datetime.now()
+        
+        return self.sensor_data
+
+
+    def _load_simulator_configuration(self):
+        # If running in simulator mode, configure simulator here 
+        pass
+
+
+    def _merge_sensor_data(self, cur_data, new_data):
+        # Merge new sensor data appropriately
+        if not cur_data:
+            return new_data 
+        else:
+            # TODO - add sensor data merge handling/calibration 
+            return cur_data
+
 
 if __name__ == "__main__":
-    sensor_handler = SensorDataHandler()
-    while not rospy.is_shutdown():
-        sensor_data = sensor_handler.get_sensor_data()
-        processed_data = process_sensor_data(sensor_data)
-        # Do something with the processed data
+    node = SensorDataHandler()
+    rospy.spin()
