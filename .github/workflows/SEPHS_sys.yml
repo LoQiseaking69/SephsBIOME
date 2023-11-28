@@ -2,7 +2,7 @@
 
 metadata:
   description: "Comprehensive YAML configuration for SEPHSbiome project, including models, controllers, and algorithms"
-  author: Ant O, Greene
+  author: "Ant O Greene"
   date_created: 2023-11-27
   version: 1.0
 
