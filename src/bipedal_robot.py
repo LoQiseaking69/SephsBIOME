@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 import rospy
-from std_msgs.msg import String, Float64
 from robot_msgs.msg import RobotStatus
-class BipedalRobot():
+from std_msgs.msg import Float64
+
+class BipedalRobot:
 
     def __init__(self):
         rospy.init_node('bipedal_robot')
@@ -11,8 +12,8 @@ class BipedalRobot():
         self.learning_ability = 100
         self.energy_level = 100
         self.max_capacity = 200
-        self._pub_status = rospy.Publisher('/robot/status', RobotStatus, queue_size=10)
 
+        self._pub_status = rospy.Publisher('/robot/status', RobotStatus, queue_size=10)
         self._sub_energy = rospy.Subscriber('/robot/energy', Float64, self.update_energy)
 
     def update_energy(self, data):
@@ -27,12 +28,14 @@ class BipedalRobot():
         if self.energy_level == 0:
             rospy.logwarn("Cannot receive assistance without energy!")
             return
-        for skill in assistance_request:
-            self.apply_assistance(skill, assistance_request[skill])
+
+        for skill, assist_value in assistance_request.items():
+            self.apply_assistance(skill, assist_value)
+
         self.publish_status()
 
     def apply_assistance(self, skill, assist_value):
-        curr_capacity = getattr(self, skill + '_ability')
+        curr_capacity = getattr(self, skill + '_ability', 0)
         boost = self.get_boost_value(assist_value, curr_capacity)
         setattr(self, skill + '_ability', curr_capacity + boost)
 
@@ -45,8 +48,8 @@ class BipedalRobot():
         status.mobility = self.mobility
         status.learning = self.learning_ability
         status.energy = self.energy_level
-        self._pub_status.publish(status)
 
+        self._pub_status.publish(status)
 
 if __name__ == "__main__":
     robot = BipedalRobot()
