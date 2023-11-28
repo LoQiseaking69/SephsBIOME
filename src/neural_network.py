@@ -2,14 +2,11 @@ from tensorflow import keras
 from tensorflow.keras import layers, optimizers
 import tensorflow as tf
 
-# Custom layer to process boolean logic
 class BoolformerLayer(layers.Layer):
     def __init__(self, **kwargs):
         super(BoolformerLayer, self).__init__(**kwargs)
-        # Additional initialization can be added here
 
     def build(self, input_shape):
-        super(BoolformerLayer, self).build(input_shape)
         self.dense_layer = layers.Dense(input_shape[-1], activation='relu')
 
     def call(self, inputs):
@@ -17,7 +14,6 @@ class BoolformerLayer(layers.Layer):
         logic_transformed = self.dense_layer(logic_and)
         return logic_transformed
 
-# Positional encoding for transformer model
 def positional_encoding(seq_length, d_model):
     position = tf.range(seq_length)[:, tf.newaxis]
     div_term = tf.exp(tf.range(0, d_model, 2) * -(tf.math.log(10000.0) / d_model))
@@ -27,7 +23,6 @@ def positional_encoding(seq_length, d_model):
     pos_encoding = pos_encoding[tf.newaxis, ...]
     return tf.cast(pos_encoding, dtype=tf.float32)
 
-# Transformer encoder block
 def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
     x = layers.LayerNormalization(epsilon=1e-6)(inputs)
     x = layers.MultiHeadAttention(key_dim=head_size, num_heads=num_heads, dropout=dropout)(x, x)
@@ -40,14 +35,12 @@ def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout=0):
     x = layers.Dense(inputs.shape[-1])(x)
     return x + res
 
-# Q-Learning layer for reinforcement learning
 class QLearningLayer(layers.Layer):
     def __init__(self, action_space_size, learning_rate=0.01, gamma=0.95, **kwargs):
         super(QLearningLayer, self).__init__(**kwargs)
         self.action_space_size = action_space_size
         self.learning_rate = learning_rate
         self.gamma = gamma
-        self.q_table = None
 
     def build(self, input_shape):
         self.q_table = tf.Variable(initial_value=tf.random.uniform([input_shape[-1], self.action_space_size], 0, 1), trainable=True)
@@ -56,10 +49,8 @@ class QLearningLayer(layers.Layer):
         if action is not None and reward is not None and next_state is not None:
             q_update = reward + self.gamma * tf.reduce_max(self.q_table[next_state])
             self.q_table[state, action].assign((1 - self.learning_rate) * self.q_table[state, action] + self.learning_rate * q_update)
-
         return tf.argmax(self.q_table[state], axis=1)
 
-# Model creation function
 def create_neural_network_model(seq_length, d_model, action_space_size):
     input_layer = keras.Input(shape=(seq_length, d_model))
 
