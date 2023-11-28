@@ -8,35 +8,32 @@ jobs:
   lint-python:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v3 # Updated to the latest version
+    - uses: actions/checkout@v3
     - name: Set up Python
-      uses: actions/setup-python@v3 # Updated to the latest version
+      uses: actions/setup-python@v3
       with:
-        python-version: '3.8' # Ensure this matches your project's Python version
+        python-version: '3.8' # Match this with your project's Python version
     - name: Install Python dependencies
-      run: pip install flake8 # Add any other necessary packages
+      run: pip install flake8
     - name: Lint Python code
       run: flake8 .
 
-  # Docker Build
+  # Docker Build and Push
   build-docker:
     runs-on: ubuntu-20.04
     needs: lint-python
     steps:
-    - uses: actions/checkout@v3 # Updated to the latest version
+    - uses: actions/checkout@v3
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2 # Updated to the latest version
+      uses: docker/setup-buildx-action@v2
     - name: Login to DockerHub
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: docker/login-action@v2 # Updated to the latest version
+      uses: docker/login-action@v2
       with:
         username: SephAros
         password: ${{ secrets.SEPHSDISC }}
     - name: Build and push Docker image
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-      uses: docker/build-push-action@v3 # Updated to the latest version
-      with:
-        push: true
-        tags: sepharos/sephsbiome:${{ github.sha }}
-        file: ./Docker/Dockerfile # Adjusted to point to the Dockerfile in the Docker folder
-        context: . # The context is set to the current directory
+      run: |
+        docker build --build-arg RUN_SETUP_SCRIPT=true -t sepharos/sephsbiome:${{ github.sha }} -f ./Docker/Dockerfile .
+        docker push sepharos/sephsbiome:${{ github.sha }}
