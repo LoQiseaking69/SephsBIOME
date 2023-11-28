@@ -12,7 +12,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
+        python-version: '3.8' # Adjust this to your project's Python version
     - name: Install flake8 for linting
       run: pip install flake8
     - name: Lint Python code
@@ -37,11 +37,4 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: SephAros/myapp:latest
-
-
-
-network:
-  ros_master_uri: "http://localhost:11311"
-  node_name: "sensor_data_handler"
-  use_simulator: false
+        tags: SephAros/sephsbiome:latest
