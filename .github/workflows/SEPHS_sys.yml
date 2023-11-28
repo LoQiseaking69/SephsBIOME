@@ -2,7 +2,7 @@
 
 metadata:
   description: "Comprehensive YAML configuration for SEPHSbiome project, including models, controllers, and algorithms"
-  author: "Ant O Greene"
+  author: Ant O Greene
   date_created: 2023-11-27
   version: 1.0
 
@@ -82,7 +82,7 @@ infrastructure:
   logging:
     level: INFO
     format: "%(asctime)s - %(levelname)s - %(message)s"
-    file: /var/log/sephsbiome.log
+    file: "/var/log/sephsbiome.log"
   simulator:
     environment: "Default Simulation Environment"
     physics_engine: "Basic Physics"
@@ -104,110 +104,3 @@ network:
   ros_master_uri: "http://localhost:11311"
   node_name: "sensor_data_handler"
   use_simulator: false
-# SEPHSbiome.yaml
-
-metadata:
-  description: "Comprehensive YAML configuration for SEPHSbiome project, including models, controllers, and algorithms"
-  author: [Your Name]
-  date_created: 2023-11-27
-  version: 1.0
-
-common:
-  model_params: &common_model_params
-    seq_length:
-      type: integer
-      minimum: 1
-      maximum: 250
-      default: 10
-      description: "Sequence length for model"
-    d_model:
-      type: integer
-      minimum: 8
-      maximum: 512  
-      default: 32
-      description: "Transformer model hidden size"
-    action_space:
-      type: integer
-      minimum: 2
-      maximum: 1000
-      default: 5
-      description: "Output action space size"
-
-controllers:
-  bipedal_robot:
-    type: node
-    description: "Bipedal robot controller and state manager"
-    module: bipedal_robot
-    class: BipedalRobot
-    topics:
-      status: 
-        topic: /robot/status
-        type: publish
-        msg_type: RobotStatus
-        queue_size: 10
-      energy:  
-        topic: /robot/energy 
-        type: subscribe
-        msg_type: Float64
-
-algorithms:
-  evolution_engine:
-    type: module
-    description: "Neuroevolution algorithm for optimizing robot behavior"
-    module: evolution
-    parameters:
-      <<: *common_model_params
-      population_size:
-        type: integer
-        minimum: 10
-        maximum: 500
-        default: 100
-        description: "Size of the population for evolutionary algorithms"
-  neural_network:
-    type: module
-    description: "Deep learning model for sensor data processing and decision making"
-    module: neural_network
-    custom_layers:
-      - BoolformerLayer
-      - QLearningLayer
-    training:
-      loss:
-        Output: categorical_crossentropy
-        Reward: mean_squared_error
-      metrics:
-        Output: accuracy
-      optimizer:
-        type: Adam
-        learning_rate:
-          type: float
-          minimum: 0.0001
-          maximum: 0.1
-          description: "Learning rate for the neural network optimizer"
-
-infrastructure:
-  logging:
-    level: INFO
-    format: "%(asctime)s - %(levelname)s - %(message)s"
-    file: /var/log/sephsbiome.log
-  simulator:
-    environment: "Default Simulation Environment"
-    physics_engine: "Basic Physics"
-    rendering: true
-
-sensors:
-  imu:
-    type: "Inertial Measurement Unit"
-    description: "Provides acceleration and rotational data"
-    topic: /robot/sensors/imu
-    frame_rate: 50
-  joint_states:
-    type: "Joint State Sensor"
-    description: "Monitors and reports the state of robot joints"
-    topic: /robot/joint_states
-    frame_rate: 50
-
-network:
-  ros_master_uri: "http://localhost:11311"
-  node_name: "sensor_data_handler"
-  use_simulator: false
-
