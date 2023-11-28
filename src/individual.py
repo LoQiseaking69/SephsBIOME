@@ -98,6 +98,6 @@ class Individual:
         return np.mean([gene.kinematic_trait for gene in efficiency_genes]) * 20 if efficiency_genes else 0
 
 # Example usage (within a ROS environment):
-# genome = Genome()  # Assuming Genome() is properly defined
-# individual = Individual(genome, seq_length=10, d_model=32)
-# rospy.spin()  # Keep the ROS node running
+ genome = Genome()  # Assuming Genome() is properly defined
+ individual = Individual(genome, seq_length=10, d_model=32)
+ rospy.spin()  # Keep the ROS node running
