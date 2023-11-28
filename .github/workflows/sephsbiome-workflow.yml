@@ -14,7 +14,9 @@ jobs:
       with:
         python-version: '3.8' # Match this with your project's Python version
     - name: Install Python dependencies
-      run: pip install flake8
+      run: |
+        pip install flake8
+        pip install PyYAML # Install PyYAML for YAML file handling
     - name: Lint Python code
       run: flake8 .
 
