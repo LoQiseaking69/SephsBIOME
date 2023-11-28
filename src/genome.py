@@ -2,21 +2,24 @@ import random
 import copy
 
 class Gene:
+    NEURON = 0
+    SENSOR = 1
+    ACTION = 1
+
     def __init__(self, source_type, source_num, sink_type, sink_num, weight, kinematic_trait, innovation=None, complex_behavior=False):
-        self.source_type = source_type  # 0 for NEURON, 1 for SENSOR
+        self.source_type = source_type
         self.source_num = source_num
-        self.sink_type = sink_type      # 0 for NEURON, 1 for ACTION
+        self.sink_type = sink_type
         self.sink_num = sink_num
         self.weight = weight
-        self.kinematic_trait = kinematic_trait  # New attribute for kinematic trait
+        self.kinematic_trait = kinematic_trait
         self.innovation = innovation
-        self.complex_behavior = complex_behavior  # Indicates complex behavior involvement
+        self.complex_behavior = complex_behavior
 
     def mutate_trait(self):
-        # Logic to mutate kinematic trait
-        trait_variation = random.uniform(-0.1, 0.1)  # Small random variation
+        trait_variation = random.uniform(-0.1, 0.1)
         self.kinematic_trait += trait_variation
-        self.kinematic_trait = max(0, min(self.kinematic_trait, 1))  # Keep within bounds
+        self.kinematic_trait = max(0, min(self.kinematic_trait, 1))
 
 class Genome:
     def __init__(self, genes=None):
@@ -32,7 +35,7 @@ class Genome:
                 mutation_type = random.choice(["weight", "add_connection", "remove_connection", "modify_interaction", "mutate_trait"])
                 if mutation_type == "weight":
                     gene.weight += random.uniform(-1, 1)
-                    gene.weight = max(-1, min(gene.weight, 1))  # Keep weight within bounds
+                    gene.weight = max(-1, min(gene.weight, 1))
                 elif mutation_type == "add_connection":
                     self.add_random_connection()
                 elif mutation_type == "remove_connection":
@@ -43,12 +46,12 @@ class Genome:
                     gene.mutate_trait()
 
     def add_random_connection(self):
-        source_type = random.choice([0, 1])
-        sink_type = random.choice([0, 1])
-        source_num = random.randint(0, 10)  # Assuming a range for source and sink identifiers
+        source_type = random.choice([Gene.NEURON, Gene.SENSOR])
+        sink_type = random.choice([Gene.NEURON, Gene.ACTION])
+        source_num = random.randint(0, 10)
         sink_num = random.randint(0, 10)
         weight = random.uniform(-1, 1)
-        kinematic_trait = random.uniform(0, 1)  # Random kinematic trait value
+        kinematic_trait = random.uniform(0, 1)
         complex_behavior = random.choice([True, False])
         self.add_connection(source_type, source_num, sink_type, sink_num, weight, kinematic_trait, complex_behavior)
 
@@ -58,18 +61,18 @@ class Genome:
             self.genes.remove(gene_to_remove)
 
     def modify_gene_interaction(self, gene):
-        if gene.source_type == 1:
+        if gene.source_type == Gene.SENSOR:
             gene.weight *= random.uniform(0.8, 1.2)
-            gene.weight = max(-1, min(gene.weight, 1))  # Keep weight within bounds
-        elif gene.sink_type == 1:
+        elif gene.sink_type == Gene.ACTION:
             gene.weight += random.uniform(-0.5, 0.5)
-            gene.weight = max(-1, min(gene.weight, 1))  # Keep weight within bounds
+        gene.weight = max(-1, min(gene.weight, 1))
+
         if gene.complex_behavior:
             self.adjust_complex_behavior(gene)
 
     def adjust_complex_behavior(self, gene):
-        gene.weight += random.uniform(-0.3, 0.3)  # Adjust weight for complex behaviors
-        gene.weight = max(-1, min(gene.weight, 1))  # Keep weight within bounds
+        gene.weight += random.uniform(-0.3, 0.3)
+        gene.weight = max(-1, min(gene.weight, 1))
 
     def crossover(self, other_genome):
         new_genes = []
