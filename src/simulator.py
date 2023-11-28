@@ -8,7 +8,7 @@ class Simulator:
         self.population_size = population_size
         self.seq_length = seq_length
         self.d_model = d_model
-        self.sensor_handler = SensorDataHandler()  # Initialize sensor data handler
+        self.sensor_handler = SensorDataHandler()
         self.population = [Individual(Genome(), seq_length, d_model) for _ in range(population_size)]
 
     def select_parents(self):
@@ -63,5 +63,3 @@ class Simulator:
                 individual.reward_log = []
 
         return fitness_over_time, decisions_over_time
-
-# Additional code for testing or initialization can be added here if necessary
