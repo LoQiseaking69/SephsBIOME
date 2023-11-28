@@ -1,0 +1,108 @@
+# SEPHS_sysm.yml
+
+metadata:
+
+  description: YAML configuration for bipedal robotics system
+  author: Claude
+  date_created: 2023-02-28
+
+
+common:
+
+  model_params:
+
+    seq_length:  
+      type: integer
+      minimum: 1
+      maximum: 250
+      default: 10
+      description: Sequence length for model
+
+    d_model:
+      type: integer
+      minimum: 8
+      maximum: 512  
+      default: 32
+      description: Transformer model hidden size
+      
+    action_space:
+      type: integer
+      minimum: 2
+      maximum: 1000
+      default: 5
+      description: Output action space size
+
+
+controllers:
+
+  bipedal_robot:
+
+    type: node
+    description: Bipedal robot controller and state manager
+    module: bipedal_robot
+    class: BipedalRobot
+
+    topics:
+
+      status: 
+        topic: /robot/status
+        type: publish
+        msg_type: RobotStatus
+        queue_size: 10
+
+      energy:  
+        topic: /robot/energy 
+        type: subscribe
+        msg_type: Float64
+
+
+algorithms:
+
+  evolution_engine:
+
+    type: module
+    description: Neuroevolution algorithm 
+    module: evolution
+
+    parameters:
+      <<: *common_model_params 
+      population_size: 
+        type: integer
+        minimum: 10
+        maximum: 500
+        default: 100
+
+  neural_network:
+
+    type: module
+    description: Neural network prediction model
+    module: neural_network
+
+    custom_layers:
+
+      - BoolformerLayer
+      - QLearningLayer
+
+    training:
+    
+      loss:  
+        Output: categorical_crossentropy
+        Reward: mean_squared_error
+
+      metrics: 
+        Output: accuracy
+      
+      optimizer:  
+        type: Adam
+        learning_rate:   
+          type: float
+          minimum: 0.0001
+          maximum: 0.1
+
+
+infrastructure:
+
+  logging:
+
+    level: INFO 
+    format: "%(asctime)s - %(levelname)s - %(message)s"
