@@ -1,6 +1,7 @@
 import rospy
 import numpy as np
-from sensor_msgs.msg import Imu, JointState  
+import yaml
+from sensor_msgs.msg import Imu, JointState
 from datetime import datetime
 
 class SensorDataHandler():
@@ -48,7 +49,17 @@ class SensorDataHandler():
         return self.sensor_data
 
     def _load_simulator_configuration(self):
-        pass  # Simulator configuration logic
+        if self._sensor_config_path:
+            try:
+                with open(self._sensor_config_path, 'r') as file:
+                    config = yaml.safe_load(file)
+                rospy.loginfo(f"Simulator configuration loaded from {self._sensor_config_path}")
+            except IOError as e:
+                rospy.logerr(f"Could not read simulator configuration file: {e}")
+                config = {}
+
+        # Set default configuration if file is not found or empty
+        self.simulator_config = config.get('simulator', {'environment': 'default', 'physics': 'basic'})
 
     def _merge_sensor_data(self, cur_data, new_data):
         if not cur_data:
@@ -81,12 +92,6 @@ class SensorDataHandler():
         merged_joint_states.velocity = np.mean([cur_joint_states.velocity, new_joint_states.velocity], axis=0)
         merged_joint_states.effort = np.mean([cur_joint_states.effort, new_joint_states.effort], axis=0)
         return merged_joint_states
-
-if __name__ == "__main__":
-    node = SensorDataHandler()
-    rospy.spin()
-
-
 
 if __name__ == "__main__":
     node = SensorDataHandler()
