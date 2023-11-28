@@ -1,0 +1,47 @@
+name: SEPHSbiome CI Workflow
+
+# Trigger the workflow on push or pull request to any branch
+on: [push, pull_request]
+
+jobs:
+  # Python Linting
+  lint-python:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Install flake8 for linting
+      run: pip install flake8
+    - name: Lint Python code
+      run: flake8 .
+
+  # Docker Build
+  build-docker:
+    runs-on: ubuntu-latest
+    needs: lint-python
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to DockerHub
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: docker/login-action@v1
+      with:
+        username: SephAros
+        password: ${{ secrets.SEPHSDISC }}
+    - name: Build and push Docker image
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        tags: SephAros/myapp:latest
+
+
+
+network:
+  ros_master_uri: "http://localhost:11311"
+  node_name: "sensor_data_handler"
+  use_simulator: false
