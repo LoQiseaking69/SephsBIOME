@@ -4,7 +4,7 @@ import yaml
 from sensor_msgs.msg import Imu, JointState
 from datetime import datetime
 
-class SensorDataHandler():
+class SensorDataHandler:
     def __init__(self):
         self._parse_parameters()
         rospy.init_node(self._node_name, anonymous=True)
@@ -34,7 +34,6 @@ class SensorDataHandler():
 
     def _joint_state_callback(self, data):
         self.data['joint_states'] = data
-
     def get_latest_sensor_data(self):
         now = datetime.now()
         while 'imu' not in self.data or 'joint_states' not in self.data:
@@ -58,7 +57,6 @@ class SensorDataHandler():
                 rospy.logerr(f"Could not read simulator configuration file: {e}")
                 config = {}
 
-        # Set default configuration if file is not found or empty
         self.simulator_config = config.get('simulator', {'environment': 'default', 'physics': 'basic'})
 
     def _merge_sensor_data(self, cur_data, new_data):
