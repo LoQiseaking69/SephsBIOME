@@ -12,9 +12,9 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.8' # Adjust this to your project's Python version
-    - name: Install flake8 for linting
-      run: pip install flake8
+        python-version: '3.8' # Ensure this matches your project's Python version
+    - name: Install Python dependencies
+      run: pip install flake8 # Add any other necessary packages
     - name: Lint Python code
       run: flake8 .
 
@@ -37,4 +37,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: SephAros/sephsbiome:latest
+        tags: sepharos/sephsbiome:${{ github.sha }}
+        file: ./Docker/Dockerfile # Adjusted to point to the Dockerfile in the Docker folder
+        context: . # The context is set to the current directory
+
