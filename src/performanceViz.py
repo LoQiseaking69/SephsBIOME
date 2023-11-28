@@ -8,7 +8,7 @@ from threading import Thread
 class PerformanceVisualizer:
     def __init__(self, buffer_size=100, refresh_rate=0.1):
         rospy.init_node('performance_visualizer')
-        
+
         self.buffer_size = buffer_size
         self.refresh_rate = refresh_rate
         self.data_buffers = {
