@@ -1,8 +1,7 @@
 openapi: 3.0.0
 info:
   title: SEPHSbiome Development Assistant API
-  description: A comprehensive API for managing SEPHSbiome project development and operations.
-  version: 1.0.0
+  version: 2.0.0
 servers:
   - url: http://localhost:5000
     description: Local Development Server
@@ -94,3 +93,115 @@ paths:
       responses:
         '200':
           description: Docker container ran successfully.
+
+  # New Endpoints
+
+  /api/v1/webhooks/github:
+    post:
+      operationId: handleGithubWebhook
+      summary: Handle GitHub webhook.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                  description: The GitHub event type.
+                payload:
+                  type: object
+                  description: The payload of the webhook.
+      responses:
+        '200':
+          description: Webhook processed successfully.
+        '400':
+          description: Invalid request or payload.
+
+  /api/v1/ci/run-pipeline:
+    post:
+      operationId: runPipeline
+      summary: Trigger CI/CD pipeline.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pipeline:
+                  type: string
+                  description: The name of the pipeline to run.
+      responses:
+        '200':
+          description: Pipeline triggered successfully.
+        '400':
+          description: Invalid pipeline name.
+
+  /api/v1/logs:
+    get:
+      operationId: getLogs
+      summary: Fetch log data.
+      parameters:
+        - in: query
+          name: level
+          schema:
+            type: string
+          description: The log level to filter by.
+      responses:
+        '200':
+          description: Log data returned.
+        '400':
+          description: Invalid log level.
+
+  /api/v1/auth/login:
+    post:
+      operationId: loginUser
+      summary: User login.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: The user's username.
+                password:
+                  type: string
+                  description: The user's password.
+      responses:
+        '200':
+          description: Login successful, token returned.
+        '401':
+          description: Unauthorized, invalid credentials.
+
+  /api/v1/cache/clear:
+    post:
+      operationId: clearCache
+      summary: Clear cache.
+      responses:
+        '200':
+          description: Cache cleared successfully.
+
+  /api/v1/tests/run:
+    post:
+      operationId: runTests
+      summary: Run automated tests.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                suite:
+                  type: string
+                  description: The test suite to run.
+      responses:
+        '200':
+          description: Tests executed successfully.
+        '400':
+          description: Invalid test suite.
