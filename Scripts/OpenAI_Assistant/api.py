@@ -21,6 +21,24 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+# Create SQLite tables if they don't exist
+def create_tables():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Example table creation queries
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY,
+        username TEXT,
+        password TEXT
+    );
+    """
+    
+    cursor.execute(create_table_query)
+    conn.commit()
+    conn.close()
+
 @app.route('/api/v1/github/dispatch-workflow', methods=['POST'])
 def dispatch_github_workflow():
     # Implementation for dispatching GitHub workflow
@@ -132,4 +150,5 @@ def run_tests():
     return jsonify({"message": f"Test suite {test_suite} executed"}), 200
 
 if __name__ == '__main__':
+    create_tables()  # Create tables when the script is run
     app.run(debug=True, host='0.0.0.0', port=5000)
