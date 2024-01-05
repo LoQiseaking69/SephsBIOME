@@ -1,7 +1,7 @@
 
 # Seph's Biome
 ## Overview
-Seph's Biome aims to integrate cutting-edge technologies and a diverse set of algorythmically advanced methodololgies; to evolve, kinematic abilities in bipedal robots.
+Seph's Biome aims to integrate cutting-edge technologies and a diverse set of algorythmically advanced methodololgies to evolve kinematic abilities in bipedal robots.
 
 ## Features
 - **Evolutionary Algorithms**: Employ genetic algorithms for the progressive evolution of robot behaviors.
