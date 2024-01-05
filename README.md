@@ -60,7 +60,7 @@ python3 main.py
 We welcome contributions to the Seph's Biome project. Please read our contributing guidelines before submitting pull requests.
 
 ## License
-This project is licensed under the MPL 2.0 License - see the LICENSE.md file for details.
+This project is licensed under GNU GENERAL PUBLIC LICENSE - see the LICENSE.md file for details.
 
 ## Acknowledgments
 - Contributors and community members who have contributed to this project.
