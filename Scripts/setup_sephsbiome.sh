@@ -32,9 +32,34 @@ error_exit() {
     exit 1
 }
 
+confirm_action() {
+    read -p "$1 (y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        return 0
+    else
+        print_warning "Action skipped by user."
+        return 1
+    fi
+}
+
+retry() {
+    local n=1
+    until [ "$n" -ge "$RETRY_MAX" ]; do
+        "$@" && break || {
+            if [ "$n" -lt "$RETRY_MAX" ]; then
+                n=$((n+1))
+                print_warning "Attempt $n/$RETRY_MAX failed! Trying again in 5 seconds..."
+                sleep 5
+            else
+                error_exit "The command has failed after $n attempts."
+            fi
+        }
+    done
+}
+
 cleanup() {
     print_warning "Cleaning up resources..."
-    # Deactivate virtual environment if active
     if [ -n "$VIRTUAL_ENV" ]; then
         deactivate
     fi
