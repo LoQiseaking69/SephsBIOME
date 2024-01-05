@@ -9,6 +9,7 @@ servers:
 paths:
   /github/dispatch-workflow:
     post:
+      operationId: dispatchGithubWorkflow
       summary: Triggers a GitHub Actions workflow.
       requestBody:
         required: true
@@ -24,8 +25,10 @@ paths:
       responses:
         '200':
           description: Workflow dispatched successfully.
+
   /vscode/command:
     post:
+      operationId: executeVscodeCommand
       summary: Executes a Visual Studio Code command.
       requestBody:
         required: true
@@ -41,14 +44,18 @@ paths:
       responses:
         '200':
           description: VSCode command executed successfully.
+
   /sentry/issues:
     get:
+      operationId: getSentryIssues
       summary: Retrieves a list of issues from Sentry.
       responses:
         '200':
           description: List of Sentry issues.
+
   /sqlite/query:
     post:
+      operationId: executeSqliteQuery
       summary: Executes a query against the SQLite database.
       requestBody:
         required: true
@@ -64,8 +71,10 @@ paths:
       responses:
         '200':
           description: Query executed successfully, results returned.
+
   /docker/run-container:
     post:
+      operationId: runDockerContainer
       summary: Runs a Docker container with the specified image and command.
       requestBody:
         required: true
