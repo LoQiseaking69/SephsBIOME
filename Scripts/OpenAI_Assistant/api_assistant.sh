@@ -5,6 +5,11 @@ API_VENV_DIR="api-env"
 API_SCRIPT="api.py"
 API_LOG_FILE="api_assistant_log_$(date +%Y%m%d_%H%M%S).txt"
 RETRY_MAX=3
+REQUIRED_PYTHON_VERSION=3  # Set your required Python version
+
+print_log() {
+    echo -e "\033[0;36m$1\033[0m"
+}
 
 print_success() {
     echo -e "\033[0;32m$1\033[0m"
@@ -39,6 +44,12 @@ exec > >(tee "$API_LOG_FILE") 2>&1
 
 echo "Setting up API Assistant..."
 
+# Check Python version
+PYTHON_VERSION=$(python3 -c 'import platform; print(platform.python_version())')
+if [[ $PYTHON_VERSION < $REQUIRED_PYTHON_VERSION ]]; then
+    error_exit "Python $REQUIRED_PYTHON_VERSION or higher is required. You have Python $PYTHON_VERSION."
+fi
+
 # Check if virtual environment already exists
 if [ -d "$API_VENV_DIR" ]; then
     print_warning "Virtual environment $API_VENV_DIR already exists. Activating environment."
@@ -56,15 +67,40 @@ retry pip install --upgrade pip
 
 # Install Flask and other dependencies
 print_log "Installing Flask and other dependencies..."
-retry pip install flask flask_jwt_extended requests
+retry pip install flask flask_jwt_extended requests python-dotenv
 
-# Set up necessary environment variables
-export SEPHSBIOME_DATABASE_URL='sephsbiome.db'
-export JWT_SECRET_KEY='super-secret-key'
-export GITHUB_TOKEN='your-github-token'
-export SENTRY_AUTH_TOKEN='your-sentry-auth-token'
-export SENTRY_ORG_SLUG='your-org'
-export SENTRY_PROJECT_SLUG='your-project'
+# Check for .env file and create if it doesn't exist, setting default values
+if [ ! -f ".env" ]; then
+    print_log "Creating .env file..."
+    touch .env
+    # Set default values
+    echo 'SEPHSBIOME_DATABASE_URL=sephsbiome.db' > .env
+    echo 'JWT_SECRET_KEY=super-secret-key' >> .env
+    echo 'GITHUB_TOKEN=your-github-token' >> .env
+    echo 'SENTRY_AUTH_TOKEN=your-sentry-auth-token' >> .env
+    echo 'SENTRY_ORG_SLUG=your-org' >> .env
+    echo 'SENTRY_PROJECT_SLUG=your-project' >> .env
+    print_log ".env file created with default values."
+else
+    print_log ".env file already exists."
+fi
+
+# Load environment variables
+print_log "Loading environment variables..."
+set -o allexport
+source .env
+set +o allexport
+
+# Check and set default environment variables if they are not set
+: ${SEPHSBIOME_DATABASE_URL:='sephsbiome.db'}
+: ${JWT_SECRET_KEY:='super-secret-key'}
+: ${GITHUB_TOKEN:='your-github-token'}
+: ${SENTRY_AUTH_TOKEN:='your-sentry-auth-token'}
+: ${SENTRY_ORG_SLUG:='your-org'}
+: ${SENTRY_PROJECT_SLUG:='your-project'}
+
+# Export the variables to ensure they are available
+export SEPHSBIOME_DATABASE_URL JWT_SECRET_KEY GITHUB_TOKEN SENTRY_AUTH_TOKEN SENTRY_ORG_SLUG SENTRY_PROJECT_SLUG
 
 # Check if API script exists
 if [ ! -f "$API_SCRIPT" ]; then
