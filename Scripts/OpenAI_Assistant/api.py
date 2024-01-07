@@ -4,8 +4,17 @@ import sqlite3
 import subprocess
 import requests
 import os
+import hashlib
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 import json
+
+# Attempt to import project-specific modules if they exist
+try:
+    from .src import simulator
+    from .src import performanceViz
+    from .src import evolution
+except ImportError:
+    simulator = performanceViz = evolution = None
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -15,18 +24,14 @@ DATABASE_URL = os.getenv('SEPHSBIOME_DATABASE_URL', 'sephsbiome.db')
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'super-secret-key')
 jwt = JWTManager(app)
 
-# Connect to SQLite database
 def get_db_connection():
     conn = sqlite3.connect(DATABASE_URL, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     return conn
 
-# Create SQLite tables if they don't exist
 def create_tables():
     conn = get_db_connection()
     cursor = conn.cursor()
-    
-    # Example table creation queries
     create_table_query = """
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY,
@@ -34,14 +39,13 @@ def create_tables():
         password TEXT
     );
     """
-    
     cursor.execute(create_table_query)
     conn.commit()
     conn.close()
 
+# GitHub Workflow Dispatch
 @app.route('/api/v1/github/dispatch-workflow', methods=['POST'])
 def dispatch_github_workflow():
-    # Implementation for dispatching GitHub workflow
     workflow = request.json['workflow']
     github_token = os.getenv('GITHUB_TOKEN')
     repo = os.getenv('GITHUB_REPOSITORY', 'username/repo')
@@ -55,9 +59,9 @@ def dispatch_github_workflow():
         return jsonify({"error": "Failed to dispatch workflow"}), 500
     return jsonify({"message": "Workflow dispatched successfully"})
 
+# VSCode Command
 @app.route('/api/v1/vscode/command', methods=['POST'])
 def vscode_command():
-    # Implementation for executing VSCode command
     command = request.json['command']
     result = subprocess.run(["code", "--command", command], capture_output=True, text=True)
     if result.returncode != 0:
@@ -65,9 +69,9 @@ def vscode_command():
         return jsonify({"error": "Failed to execute command", "stderr": result.stderr}), 500
     return jsonify({"stdout": result.stdout})
 
+# Sentry Issues
 @app.route('/api/v1/sentry/issues', methods=['GET'])
 def sentry_issues():
-    # Implementation for retrieving Sentry issues
     sentry_auth_token = os.getenv('SENTRY_AUTH_TOKEN')
     organization_slug = os.getenv('SENTRY_ORG_SLUG', 'your-org')
     project_slug = os.getenv('SENTRY_PROJECT_SLUG', 'your-project')
@@ -80,20 +84,23 @@ def sentry_issues():
         return jsonify({"error": "Failed to retrieve Sentry issues"}), 500
     return jsonify(response.json())
 
+# SQLite Query
 @app.route('/api/v1/sqlite/query', methods=['POST'])
 def sqlite_query():
-    # Implementation for executing SQLite query
     query = request.json['query']
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    conn.close()
+    try:
+        cursor.execute(query)
+        rows = cursor.fetchall()
+    except sqlite3.Error as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
     return jsonify({"rows": [dict(ix) for ix in rows]})
-
+# Docker Run Container
 @app.route('/api/v1/docker/run-container', methods=['POST'])
 def docker_run_container():
-    # Implementation for running Docker container
     image = request.json['image']
     command = request.json.get('command', '')
     result = subprocess.run(["docker", "run", image, command], capture_output=True, text=True)
@@ -102,52 +109,81 @@ def docker_run_container():
         return jsonify({"error": "Failed to run Docker container", "stderr": result.stderr}), 500
     return jsonify({"stdout": result.stdout})
 
+# GitHub Webhooks
 @app.route('/api/v1/webhooks/github', methods=['POST'])
 def handle_github_webhook():
-    # Logic to handle GitHub webhook
     event = request.json.get('event')
     payload = request.json.get('payload')
-    # Process the GitHub webhook event and payload
+    logging.info(f"Received GitHub event: {event}")
     return jsonify({"message": f"GitHub event {event} processed"}), 200
 
+# CI/CD Run Pipeline
 @app.route('/api/v1/ci/run-pipeline', methods=['POST'])
 def run_pipeline():
-    # Logic to trigger the CI/CD pipeline
     pipeline_name = request.json.get('pipeline')
-    # Placeholder for pipeline triggering logic
+    logging.info(f"Triggering pipeline: {pipeline_name}")
     return jsonify({"message": f"Pipeline {pipeline_name} triggered"}), 200
 
+# Logs Retrieval
 @app.route('/api/v1/logs', methods=['GET'])
 def get_logs():
-    # Logic to fetch log data
     log_level = request.args.get('level')
-    # Placeholder for log fetching logic based on log_level
     return jsonify({"logs": f"Logs for level {log_level}"}), 200
 
+# User Login
 @app.route('/api/v1/auth/login', methods=['POST'])
 def login_user():
-    # User authentication logic
     username = request.json.get('username')
     password = request.json.get('password')
-    # Placeholder for real authentication check
-    if username == "admin" and password == "password":  # Example check
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+    user = cursor.fetchone()
+    conn.close()
+    if user and user['password'] == hashed_password:
         access_token = create_access_token(identity=username)
         return jsonify(access_token=access_token), 200
     else:
         return jsonify({"msg": "Bad username or password"}), 401
 
+# Cache Clear
 @app.route('/api/v1/cache/clear', methods=['POST'])
 def clear_cache():
-    # Logic to clear cache
-    # Placeholder for cache clearing logic
+    logging.info("Cache cleared")
     return jsonify({"message": "Cache cleared"}), 200
 
+# Run Tests
 @app.route('/api/v1/tests/run', methods=['POST'])
 def run_tests():
-    # Logic to run specified test suites
     test_suite = request.json.get('suite')
-    # Placeholder for test execution logic
+    logging.info(f"Executing test suite: {test_suite}")
     return jsonify({"message": f"Test suite {test_suite} executed"}), 200
+
+# SEPHSbiome-specific endpoints
+
+@app.route('/api/v1/sephsbiome/simulation', methods=['POST'])
+@jwt_required()
+def run_simulation_endpoint():
+    data = request.json
+    simulator_instance = simulator.Simulator(data['population_size'], data['seq_length'], data['d_model'])
+    result = simulator_instance.run_simulation(data['generations'])
+    return jsonify({"message": "Simulation run completed", "result": result}), 200
+
+@app.route('/api/v1/sephsbiome/visualization', methods=['GET'])
+@jwt_required()
+def visualization_endpoint():
+    viz = performanceViz.PerformanceVisualizer()
+    visualization_result = viz.visualize_data()
+    return jsonify({"visualization": visualization_result}), 200
+
+@app.route('/api/v1/sephsbiome/genetic-algorithm', methods=['POST'])
+@jwt_required()
+def run_evolution_endpoint():
+    data = request.json
+    evolution_instance = evolution.Evolution(data['population_size'], data['seq_length'], data['d_model'])
+    result = evolution_instance.run_evolution(data['generations'])
+    return jsonify({"message": "Evolution process executed", "result": result}), 200
 
 if __name__ == '__main__':
     create_tables()  # Create tables when the script is run
