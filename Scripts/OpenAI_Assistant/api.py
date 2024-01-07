@@ -1,12 +1,13 @@
 from flask import Flask, request, jsonify
+import os
+import subprocess
+import base64
 import logging
 import sqlite3
-import subprocess
-import requests
-import os
 import hashlib
+from dotenv import load_dotenv, set_key
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required
-import json
+import requests
 
 # Attempt to import project-specific modules if they exist
 try:
@@ -19,9 +20,42 @@ except ImportError:
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 
+# Dynamic JWT Secret Generation and Saving to .env File
+def generate_jwt_secret():
+    return base64.b64encode(os.urandom(32)).decode('utf-8')
+
+def create_or_update_env_file(key, value):
+    env_file = '.env'
+    if not os.path.isfile(env_file):
+        with open(env_file, 'w') as file:
+            file.write(f'{key}={value}\n')
+    else:
+        set_key(env_file, key, value)
+
+def install_vscode_cli():
+    try:
+        subprocess.run(["code", "--version"], check=True)
+    except subprocess.CalledProcessError:
+        logging.info("VSCode CLI not found. Installing VSCode...")
+        subprocess.run(["sudo", "apt", "update"])
+        subprocess.run(["sudo", "apt", "install", "-y", "code"])
+        logging.info("VSCode installed successfully")
+
+# Load existing env vars, if any
+load_dotenv('.env')
+
+# Generate and save JWT secret if not present
+if 'JWT_SECRET_KEY' not in os.environ:
+    jwt_secret = generate_jwt_secret()
+    create_or_update_env_file('JWT_SECRET_KEY', jwt_secret)
+    os.environ['JWT_SECRET_KEY'] = jwt_secret
+    logging.info("Generated and saved a new JWT secret key")
+
+install_vscode_cli()
+
 # Database and JWT configuration
 DATABASE_URL = os.getenv('SEPHSBIOME_DATABASE_URL', 'sephsbiome.db')
-app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'super-secret-key')
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 jwt = JWTManager(app)
 
 def get_db_connection():
@@ -98,6 +132,7 @@ def sqlite_query():
     finally:
         conn.close()
     return jsonify({"rows": [dict(ix) for ix in rows]})
+
 # Docker Run Container
 @app.route('/api/v1/docker/run-container', methods=['POST'])
 def docker_run_container():
