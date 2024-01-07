@@ -6,7 +6,7 @@ servers:
   - url: http://localhost:5000
     description: Local Development Server
 paths:
-  /github/dispatch-workflow:
+  /api/v1/github/dispatch-workflow:
     post:
       operationId: dispatchGithubWorkflow
       summary: Triggers a GitHub Actions workflow.
@@ -24,8 +24,10 @@ paths:
       responses:
         '200':
           description: Workflow dispatched successfully.
+        '500':
+          description: Failed to dispatch workflow.
 
-  /vscode/command:
+  /api/v1/vscode/command:
     post:
       operationId: executeVscodeCommand
       summary: Executes a Visual Studio Code command.
@@ -43,16 +45,20 @@ paths:
       responses:
         '200':
           description: VSCode command executed successfully.
+        '500':
+          description: Failed to execute VSCode command.
 
-  /sentry/issues:
+  /api/v1/sentry/issues:
     get:
       operationId: getSentryIssues
       summary: Retrieves a list of issues from Sentry.
       responses:
         '200':
           description: List of Sentry issues.
+        '500':
+          description: Failed to retrieve Sentry issues.
 
-  /sqlite/query:
+  /api/v1/sqlite/query:
     post:
       operationId: executeSqliteQuery
       summary: Executes a query against the SQLite database.
@@ -70,8 +76,10 @@ paths:
       responses:
         '200':
           description: Query executed successfully, results returned.
+        '500':
+          description: Error executing query.
 
-  /docker/run-container:
+  /api/v1/docker/run-container:
     post:
       operationId: runDockerContainer
       summary: Runs a Docker container with the specified image and command.
@@ -93,9 +101,8 @@ paths:
       responses:
         '200':
           description: Docker container ran successfully.
-
-  # New Endpoints
-
+        '500':
+          description: Failed to run Docker container.
   /api/v1/webhooks/github:
     post:
       operationId: handleGithubWebhook
@@ -205,3 +212,65 @@ paths:
           description: Tests executed successfully.
         '400':
           description: Invalid test suite.
+
+  /api/v1/sephsbiome/simulation:
+    post:
+      operationId: runSimulation
+      summary: Start a simulation process.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                population_size:
+                  type: integer
+                  description: Size of the population in the simulation.
+                seq_length:
+                  type: integer
+                  description: Length of the sequence.
+                d_model:
+                  type: integer
+                  description: Model dimension.
+                generations:
+                  type: integer
+                  description: Number of generations for the simulation.
+      responses:
+        '200':
+          description: Simulation started successfully.
+
+  /api/v1/sephsbiome/visualization:
+    get:
+      operationId: getVisualization
+      summary: Get data visualization.
+      responses:
+        '200':
+          description: Visualization data returned.
+
+  /api/v1/sephsbiome/genetic-algorithm:
+    post:
+      operationId: runGeneticAlgorithm
+      summary: Update and run the genetic algorithm.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                population_size:
+                  type: integer
+                  description: Size of the population in the genetic algorithm.
+                seq_length:
+                  type: integer
+                  description: Length of the sequence.
+                d_model:
+                  type: integer
+                  description: Model dimension.
+                generations:
+                  type: integer
+                  description: Number of generations for the genetic algorithm.
+      responses:
+        '200':
+          description: Genetic algorithm executed successfully.
