@@ -1,13 +1,26 @@
 #!/bin/bash
 
-# Default configurations
-VENV_DIR_DEFAULT="sephsbiome-env"
-REQUIRED_ROS_VERSION_DEFAULT="noetic"
-MIN_PYTHON_VERSION_DEFAULT="3.8"
-MAX_PYTHON_VERSION_DEFAULT="3.9"
-LOG_FILE="setup_log_$(date +%Y%m%d_%H%M%S).txt"
-RETRY_MAX=3
-API_ASSISTANT_SCRIPT="api_assistant.sh"
+# Load configurations from a separate file, if exists
+CONFIG_FILE="setup_config.sh"
+if [ -f "$CONFIG_FILE" ]; then
+    source "$CONFIG_FILE"
+else
+    # Default configurations
+    VENV_DIR_DEFAULT="sephsbiome-env"
+    REQUIRED_ROS_VERSION_DEFAULT="noetic"
+    MIN_PYTHON_VERSION_DEFAULT="3.8"
+    MAX_PYTHON_VERSION_DEFAULT="3.9"
+    RETRY_MAX=3
+    API_ASSISTANT_SCRIPT="api_assistant.sh"
+fi
+
+# Create a directory for logs if it doesn't exist
+LOG_DIR="logs"
+if [ ! -d "$LOG_DIR" ]; then
+    mkdir -p "$LOG_DIR"
+fi
+
+LOG_FILE="$LOG_DIR/setup_log_$(date +%Y%m%d_%H%M%S).txt"
 
 # Enhanced Function Definitions
 timestamp() {
@@ -15,7 +28,7 @@ timestamp() {
 }
 
 print_log() {
-    echo "$(timestamp) $1"
+    echo "$(timestamp) $1" | tee -a "$LOG_FILE"
 }
 
 print_success() {
@@ -32,6 +45,7 @@ error_exit() {
     exit 1
 }
 
+# Additional functions
 confirm_action() {
     read -p "$1 (y/n) " -n 1 -r
     echo
@@ -68,6 +82,7 @@ cleanup() {
 
 trap cleanup INT TERM
 
+# Check command presence
 check_command_presence() {
     for cmd in python3 pip apt-get; do
         if ! command -v $cmd &> /dev/null; then
@@ -77,18 +92,7 @@ check_command_presence() {
     print_success "All required commands are present."
 }
 
-# Ask if the API assistant should be run instead
-read -p "Do you want to run the API Assistant? (y/n) " run_api_choice
-if [[ $run_api_choice =~ ^[Yy]$ ]]; then
-    if [ -f "$API_ASSISTANT_SCRIPT" ]; then
-        ./"$API_ASSISTANT_SCRIPT"
-        exit 0
-    else
-        print_warning "API Assistant script not found. Continuing with main setup."
-    fi
-fi
-
-# Parse command-line arguments for configuration
+# Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         -v|--venv) VENV_DIR="$2"; shift ;;
@@ -100,7 +104,6 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-# Use default values if not set by arguments
 VENV_DIR=${VENV_DIR:-$VENV_DIR_DEFAULT}
 REQUIRED_ROS_VERSION=${REQUIRED_ROS_VERSION:-$REQUIRED_ROS_VERSION_DEFAULT}
 MIN_PYTHON_VERSION=${MIN_PYTHON_VERSION:-$MIN_PYTHON_VERSION_DEFAULT}
@@ -108,6 +111,17 @@ MAX_PYTHON_VERSION=${MAX_PYTHON_VERSION:-$MAX_PYTHON_VERSION_DEFAULT}
 
 # Start logging
 exec > >(tee "$LOG_FILE") 2>&1
+
+# Ask if the API assistant should be run instead
+read -p "Do you want to run the API Assistant? (y/n) " run_api_choice
+if [[ $run_api_choice =~ ^[Yy]$ ]]; then
+    if [ -f "$API_ASSISTANT_SCRIPT" ]; then
+        ./"$API_ASSISTANT_SCRIPT"
+        exit 0
+    else
+        print_warning "API Assistant script not found. Continuing with main setup."
+    fi
+fi
 
 # Check Python version
 check_python_version() {
@@ -170,11 +184,28 @@ install_python_dependencies() {
     fi
 }
 
-# Main project setup
-check_command_presence
-check_python_version
-check_ros_installation
-install_system_dependencies
-install_python_dependencies
+# Unit Test Execution
+run_unit_tests() {
+    print_log "Starting unit tests..."
+    TESTS_DIR="tests"
+    if [ -d "$TESTS_DIR" ]; then
+        for test_script in $TESTS_DIR/*.py; do
+            print_log "Running test: $test_script"
+            python "$test_script"
+            if [ $? -ne 0 ]; then
+                error_exit "Unit test failed: $test_script"
+            fi
+        done
+        print_success "All unit tests passed successfully."
+    else
+        print_warning "Unit tests directory not found."
+    fi
+}
+
+# Ask if unit tests should be run
+read -p "Do you want to perform unit tests? (y/n) " run_tests_choice
+if [[ $run_tests_choice =~ ^[Yy]$ ]]; then
+    run_unit_tests
+fi
 
 print_success "Setup complete. Virtual environment '$VENV_DIR' is ready to use."
