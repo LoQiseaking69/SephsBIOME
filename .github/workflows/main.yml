@@ -1,0 +1,58 @@
+name: SephsBiome_CI
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    container: 
+      image: ros:noetic-ros-core
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Provide execute permission to the setup script
+      run: chmod +x ./setup_sephsbiome.sh
+
+    - name: Execute the setup script
+      run: ./setup_sephsbiome.sh
+
+    - name: Initialize ROS environment
+      run: |
+        sudo rosdep init
+        rosdep update
+
+    - name: Find ROS package directory
+      id: find-ros-package
+      run: |
+        PACKAGE_DIR=$(find . -name "package.xml" -printf '%h\n' | head -n 1)
+        PACKAGE_DIR=${PACKAGE_DIR#./}
+        echo "ROS package directory: $PACKAGE_DIR"
+        echo "::set-output name=package-dir::$PACKAGE_DIR"
+
+    - name: Create ROS workspace
+      run: |
+        mkdir -p ~/ros_ws/src
+        cp -r ${{ steps.find-ros-package.outputs.package-dir }} ~/ros_ws/src
+        cd ~/ros_ws
+        source /opt/ros/noetic/setup.bash
+        rosdep install --from-paths src --ignore-src -r -y
+        catkin_make
+
+    - name: Run Unit Tests
+      run: |
+        source /opt/ros/noetic/setup.bash
+        source ~/ros_ws/devel/setup.bash
+        cd ~/ros_ws
+        catkin_make run_tests
+        catkin_test_results
+
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        flake8 ${{ steps.find-ros-package.outputs.package-dir }} --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 ${{ steps.find-ros-package.outputs.package-dir }} --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
