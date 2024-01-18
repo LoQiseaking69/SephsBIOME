@@ -1,19 +1,41 @@
 name: SephsBiome_CI
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  ROS_DISTRO: noetic
+  PYTHON_VERSION: 3.8
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
     container: 
-      image: ros:noetic-ros-core
+      image: ros:${{ env.ROS_DISTRO }}-ros-core
 
     steps:
     - uses: actions/checkout@v2
 
+    - name: Cache ROS dependencies
+      uses: actions/cache@v2
+      with:
+        path: /opt/ros/${{ env.ROS_DISTRO }}
+        key: ${{ runner.os }}-ros-${{ hashFiles('**/package.xml') }}
+
+    - name: Cache Python dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
+        python-version: ${{ env.PYTHON_VERSION }}
 
     - name: Provide execute permission to the setup script
       run: chmod +x ./setup_sephsbiome.sh
@@ -29,8 +51,7 @@ jobs:
     - name: Find ROS package directory
       id: find-ros-package
       run: |
-        PACKAGE_DIR=$(find . -name "package.xml" -printf '%h\n' | head -n 1)
-        PACKAGE_DIR=${PACKAGE_DIR#./}
+        PACKAGE_DIR=$(dirname $(find . -name "package.xml" | head -n 1))
         echo "ROS package directory: $PACKAGE_DIR"
         echo "::set-output name=package-dir::$PACKAGE_DIR"
 
@@ -39,13 +60,13 @@ jobs:
         mkdir -p ~/ros_ws/src
         cp -r ${{ steps.find-ros-package.outputs.package-dir }} ~/ros_ws/src
         cd ~/ros_ws
-        source /opt/ros/noetic/setup.bash
+        source /opt/ros/${{ env.ROS_DISTRO }}/setup.bash
         rosdep install --from-paths src --ignore-src -r -y
         catkin_make
 
     - name: Run Unit Tests
       run: |
-        source /opt/ros/noetic/setup.bash
+        source /opt/ros/${{ env.ROS_DISTRO }}/setup.bash
         source ~/ros_ws/devel/setup.bash
         cd ~/ros_ws
         catkin_make run_tests
@@ -56,3 +77,17 @@ jobs:
         pip install flake8
         flake8 ${{ steps.find-ros-package.outputs.package-dir }} --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 ${{ steps.find-ros-package.outputs.package-dir }} --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: test-results
+        path: ~/ros_ws/build/test_results/
+
+    - name: Send Failure Notification
+      if: failure()
+      uses: some-notification-action@v1
+      with:
+        message: 'CI Workflow failed'
+        # Additional notification parameters
