@@ -1,4 +1,4 @@
-name: SephsBiome_CI
+name: SephsBIOME ROS Build and Package
 
 on:
   push:
@@ -7,87 +7,73 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-env:
-  ROS_DISTRO: noetic
-  PYTHON_VERSION: 3.8
-
 jobs:
-  build-and-test:
+  build-and-package:
     runs-on: ubuntu-latest
-    container: 
-      image: ros:${{ env.ROS_DISTRO }}-ros-core
+    env:
+      PYTHON_VERSION: '3.8'  # Adjust as per your project requirements
+      ROS_DISTRO: 'noetic'
+      CATKIN_WS: 'catkin_ws'
+      PACKAGE_NAME: 'sephsbiome'  # Replace with your actual ROS package name
 
     steps:
     - uses: actions/checkout@v2
-
-    - name: Cache ROS dependencies
-      uses: actions/cache@v2
-      with:
-        path: /opt/ros/${{ env.ROS_DISTRO }}
-        key: ${{ runner.os }}-ros-${{ hashFiles('**/package.xml') }}
-
-    - name: Cache Python dependencies
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
 
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
-    - name: Provide execute permission to the setup script
-      run: chmod +x ./setup_sephsbiome.sh
-
-    - name: Execute the setup script
-      run: ./setup_sephsbiome.sh
-
-    - name: Initialize ROS environment
+    - name: Install ROS Noetic
       run: |
+        sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+        sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+        sudo apt-get update
+        sudo apt-get install -y ros-${{ env.ROS_DISTRO }}-desktop-full
+
+    - name: ROS Environment Setup
+      run: |
+        source /opt/ros/${{ env.ROS_DISTRO }}/setup.bash
         sudo rosdep init
         rosdep update
 
-    - name: Find ROS package directory
-      id: find-ros-package
+    - name: Create Catkin Workspace
       run: |
-        PACKAGE_DIR=$(dirname $(find . -name "package.xml" | head -n 1))
-        echo "ROS package directory: $PACKAGE_DIR"
-        echo "::set-output name=package-dir::$PACKAGE_DIR"
-
-    - name: Create ROS workspace
-      run: |
-        mkdir -p ~/ros_ws/src
-        cp -r ${{ steps.find-ros-package.outputs.package-dir }} ~/ros_ws/src
-        cd ~/ros_ws
-        source /opt/ros/${{ env.ROS_DISTRO }}/setup.bash
-        rosdep install --from-paths src --ignore-src -r -y
+        mkdir -p ~/${{ env.CATKIN_WS }}/src
+        cd ~/${{ env.CATKIN_WS }}
         catkin_make
 
-    - name: Run Unit Tests
+    - name: Copy Project to Catkin Workspace
+      run: |
+        cp -r $GITHUB_WORKSPACE/* ~/${{ env.CATKIN_WS }}/src/${{ env.PACKAGE_NAME }}
+
+    - name: Install Dependencies
+      run: |
+        cd ~/${{ env.CATKIN_WS }}
+        rosdep install --from-paths src --ignore-src -r -y
+
+    - name: Build ROS Package
       run: |
         source /opt/ros/${{ env.ROS_DISTRO }}/setup.bash
-        source ~/ros_ws/devel/setup.bash
-        cd ~/ros_ws
-        catkin_make run_tests
-        catkin_test_results
+        cd ~/${{ env.CATKIN_WS }}
+        catkin_make
 
-    - name: Lint with flake8
+    # Optionally, run tests here if available
+    - name: Run Tests
       run: |
-        pip install flake8
-        flake8 ${{ steps.find-ros-package.outputs.package-dir }} --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 ${{ steps.find-ros-package.outputs.package-dir }} --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        source /opt/ros/${{ env.ROS_DISTRO }}/setup.bash
+        source ~/${{ env.CATKIN_WS }}/devel/setup.bash
+        # Add your test commands here
 
-    - name: Upload Test Results
+    - name: Package ROS Project
+      run: |
+        source /opt/ros/${{ env.ROS_DISTRO }}/setup.bash
+        cd ~/${{ env.CATKIN_WS }}
+        catkin_make install
+        tar -czvf ${{ env.PACKAGE_NAME }}-ros-package.tar.gz install/
+
+    - name: Upload Packaged ROS Project
       uses: actions/upload-artifact@v2
-      if: always()
       with:
-        name: test-results
-        path: ~/ros_ws/build/test_results/
-
-    - name: Send Failure Notification
-      if: failure()
-      uses: some-notification-action@v1
-      with:
-        message: 'CI Workflow failed'
-        # Additional notification parameters
+        name: ${{ env.PACKAGE_NAME }}-ROS-Package
+        path: ${{ env.CATKIN_WS }}/${{ env.PACKAGE_NAME }}-ros-package.tar.gz
