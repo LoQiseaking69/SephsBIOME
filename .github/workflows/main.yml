@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-and-package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       PYTHON_VERSION: '3.8'  # Adjust as per your project requirements
       ROS_DISTRO: 'noetic'
@@ -58,13 +58,6 @@ jobs:
         cd ~/${{ env.CATKIN_WS }}
         catkin_make
 
-    # Optionally, run tests here if available
-    - name: Run Tests
-      run: |
-        source /opt/ros/${{ env.ROS_DISTRO }}/setup.bash
-        source ~/${{ env.CATKIN_WS }}/devel/setup.bash
-        # Add your test commands here
-
     - name: Package ROS Project
       run: |
         source /opt/ros/${{ env.ROS_DISTRO }}/setup.bash
@@ -76,4 +69,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ env.PACKAGE_NAME }}-ROS-Package
-        path: ${{ env.CATKIN_WS }}/${{ env.PACKAGE_NAME }}-ros-package.tar.gz
+        path: ~/${{ env.CATKIN_WS }}/${{ env.PACKAGE_NAME }}-ros-package.tar.gz
