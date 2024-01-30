@@ -12,7 +12,7 @@ Seph's Biome is an attempt at a cutting-edge project (baring in mind, it's a con
 ## Getting Started
 
 ### Prerequisites
-- Python 3.8 or 3.9
+- Python -latest release 
 - ROS Noetic (to be Foxy)
 - Docker (optional)
 
