@@ -3,7 +3,7 @@ import copy
 
 class Gene:
     NEURON = 0
-    SENSOR = 1
+    SENSOR = 2
     ACTION = 1
 
     def __init__(self, source_type, source_num, sink_type, sink_num, weight, kinematic_trait, innovation=None, complex_behavior=False):
