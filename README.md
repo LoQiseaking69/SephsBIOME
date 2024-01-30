@@ -3,7 +3,7 @@
 
 ## Overview
 
-Seph's Biome is an attempt at a cutting-edge project situated at the nexus of robotics, computer science, and evolutionary biology. Inspired by David Miller's bioSim project and Stephen D’Ascoli's thesis on symbolic Boolean regression, Seph's Biome explores the fascinating domain of artificial evolution, aiming to replicate and analyze complex biological behaviors in a computational setting.
+Seph's Biome is an attempt at a cutting-edge project (baring in mind, it's a continuous work of progress) situated at the nexus of robotics, computer science, and evolutionary biology. Inspired by David Miller's bioSim project and Stephen D’Ascoli's thesis on symbolic Boolean regression, Seph's Biome explores the fascinating domain of artificial evolution, aiming to replicate and analyze complex biological behaviors in a computational setting.
 
 ### Inspirations
 - **bioSim by David Miller**: [YouTube Channel](https://youtube.com/@davidrandallmiller?si=kAktZ_CpiCddPpU1)
