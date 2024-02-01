@@ -25,7 +25,6 @@ cd SephsBIOME
 After setup, the directory structure should appear as follows:
 ![Project Directory Structure](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/IMG_4622.jpg)
 Main runtime files are located in the `./src` directory.
-![Project Directory Structure](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/IMG_4617.jpg)
 
 ### Using Docker
 To build and run the project using Docker:
