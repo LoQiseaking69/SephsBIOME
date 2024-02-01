@@ -8,6 +8,14 @@ Seph's Biome is an attempt at a cutting-edge project (baring in mind, it's a con
 ### Inspirations
 - **bioSim by David Miller**: [YouTube Channel](https://youtube.com/@davidrandallmiller?si=kAktZ_CpiCddPpU1)
 - **Symbolic Boolean Regression by Stephen D’Ascoli**: [Thesis](https://sdascoli.github.io/) (DOI:2309.12207)
+- @misc{boolformer,
+ author = {d'Ascoli, Stéphane and Bengio, Samy and Susskind, Josh and Abbé, Emmanuel},
+ journal = {arXiv preprint arXiv:2309.12207},
+ title = {Boolformer: Symbolic Regression of Logic Functions with Transformers},
+ year = {2023}
+}
+
+
 
 ## Getting Started
 
