@@ -22,9 +22,6 @@ Clone the repository and navigate to the directory:
 git clone 'https://github.com/LoQiseaking69/SephsBIOME.git'
 cd SephsBIOME
 ```
-After setup, the directory structure should appear as follows:
-![Project Directory Structure](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/IMG_4622.jpg)
-Main runtime files are located in the `./src` directory.
 
 ### Using Docker
 To build and run the project using Docker:
