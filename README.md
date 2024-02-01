@@ -30,7 +30,7 @@ docker build -t sephsbiome .
 docker run -it sephsbiome
 ```
 
-### Manual Setup
+### Automatic Setup
 Run the setup script:
 ```bash
 ./setup_sephsbiome.sh
