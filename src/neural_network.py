@@ -1,6 +1,12 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, optimizers
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
 
 # Custom Layer for Boolformer, with added threshold parameter
 class BoolformerLayer(layers.Layer):
@@ -12,9 +18,26 @@ class BoolformerLayer(layers.Layer):
         self.dense_layer = layers.Dense(input_shape[-1], activation='relu')
 
     def call(self, inputs):
-        logic_and = tf.math.logical_and(inputs, inputs > self.threshold)
-        logic_transformed = self.dense_layer(logic_and)
-        return logic_transformed
+        boolean_inputs = tf.greater(inputs, self.threshold)
+        logic_and = tf.math.logical_and(boolean_inputs, boolean_inputs)
+        return self.dense_layer(tf.cast(logic_and, tf.float32))
+
+# Improved QLearningLayer with additional functionality
+class QLearningLayer(layers.Layer):
+    def __init__(self, action_space_size, learning_rate=0.01, gamma=0.95, **kwargs):
+        super(QLearningLayer, self).__init__(**kwargs)
+        self.action_space_size = action_space_size
+        self.learning_rate = learning_rate
+        self.gamma = gamma
+
+    def build(self, input_shape):
+        self.q_table = tf.Variable(initial_value=tf.random.uniform([input_shape[-1], self.action_space_size], 0, 1), trainable=True)
+
+    def call(self, state, action=None, reward=None, next_state=None):
+        if action is not None and reward is not None and next_state is not None:
+            q_update = reward + self.gamma * tf.reduce_max(self.q_table[next_state])
+            self.q_table[state, action].assign((1 - self.learning_rate) * self.q_table[state, action] + self.learning_rate * q_update)
+        return tf.argmax(self.q_table[state], axis=1)
 
 # Updated positional encoding function with improved efficiency
 def positional_encoding(seq_length, d_model):
@@ -34,23 +57,6 @@ def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout_rate=0.1):
     ffn_output = layers.Dense(inputs.shape[-1])(ffn_output)
     ffn_output = layers.Dropout(dropout_rate)(ffn_output)
     return layers.LayerNormalization(epsilon=1e-6)(attention_output + ffn_output)
-
-# Improved QLearningLayer with additional functionality
-class QLearningLayer(layers.Layer):
-    def __init__(self, action_space_size, learning_rate=0.01, gamma=0.95, **kwargs):
-        super(QLearningLayer, self).__init__(**kwargs)
-        self.action_space_size = action_space_size
-        self.learning_rate = learning_rate
-        self.gamma = gamma
-
-    def build(self, input_shape):
-        self.q_table = tf.Variable(initial_value=tf.random.uniform([input_shape[-1], self.action_space_size], 0, 1), trainable=True)
-
-    def call(self, state, action=None, reward=None, next_state=None):
-        if action is not None and reward is not None and next_state is not None:
-            q_update = reward + self.gamma * tf.reduce_max(self.q_table[next_state])
-            self.q_table[state, action].assign((1 - self.learning_rate) * self.q_table[state, action] + self.learning_rate * q_update)
-        return tf.argmax(self.q_table[state], axis=1)
 
 # Function to create and compile the neural network model
 def create_neural_network_model(seq_length, d_model, action_space_size):
