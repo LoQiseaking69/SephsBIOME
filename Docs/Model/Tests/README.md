@@ -32,7 +32,8 @@ The script requires the following Python libraries:
 - Scikit-learn
 
 ## Usage
-To run the script, place it in the same directory as your dataset and execute it with Python. Ensure to replace `'synthetic_datasetV2.csv'` with the path to your actual dataset.
+To run the script, Ensure pandas is in the environment; and, pyarrow soon (as i've noticed with package updates...) and an up-to-date version of the  `'synthetic_datasetV2.csv'`
+generated csv file, is within the function tuple for: `pd.read_csv('synthetic_datasetV2.csv')`
 
 ## Visualizations Produced
 - Histogram of Predicted Actions: Shows the frequency of each action chosen by the simulation.
