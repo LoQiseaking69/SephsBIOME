@@ -3,9 +3,9 @@
 
 ## Overview
 
-Seph's Biome is an ongoing, cutting-edge project at the intersection of robotics, computer science, and evolutionary biology. Inspired by David Miller's bioSim project and Stephen D’Ascoli's thesis on symbolic Boolean regression, this project delves into the world of artificial evolution, aiming to replicate and analyze complex biological behaviors within a computational framework.
+Seph's Biome is an ongoing endeavor to create a cutting-edge robotic operating system at the intersection of robotics, computer science, and evolutionary biology. Initially Inspired by David Miller's bioSim project and Stephen D’Ascoli's thesis on symbolic Boolean regression, this project delves into the world of artificial evolution, aiming to replicate and analyze complex biological behaviors within a computational framework.
 
-### Inspirations
+### Leading Inspirations
 - **bioSim by David Miller**: [YouTube video](https://youtu.be/N3tRFayqVtk)
 - **Symbolic Boolean Regression by Stephen D’Ascoli**: D'Ascoli, S. (2023). Boolformer: Symbolic Regression of Logic Functions with Transformers. Retrieved from [https://sdascoli.github.io/](https://sdascoli.github.io/)
 
@@ -22,9 +22,6 @@ Clone the repository and navigate to the directory:
 git clone 'https://github.com/LoQiseaking69/SephsBIOME.git'
 cd SephsBIOME
 ```
-After setup, the directory structure should appear as follows:
-![Project Directory Structure](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/IMG_4622.jpg)
-Main runtime files are located in the `./src` directory.
 
 ### Using Docker
 To build and run the project using Docker:
@@ -33,7 +30,7 @@ docker build -t sephsbiome .
 docker run -it sephsbiome
 ```
 
-### Manual Setup
+### Automatic Setup
 Run the setup script:
 ```bash
 ./setup_sephsbiome.sh
