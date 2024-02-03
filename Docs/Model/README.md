@@ -1,4 +1,5 @@
 # BoolFormer Layer Optimization with SynthDgen Integration
+*see Tests*
 
 ## Overview
 This README outlines the plan for the ongoing development and optimization of the BoolFormer layer within neural network models, specifically tailored for robotics applications. The plan integrates the use of the SynthDgen script for generating and utilizing synthetic sensor data to enhance the BoolFormer layer's capabilities.
