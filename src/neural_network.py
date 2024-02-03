@@ -1,17 +1,11 @@
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, optimizers
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
 
 # Custom Layer for Boolformer, with added threshold parameter
 class BoolformerLayer(layers.Layer):
     def __init__(self, threshold=0.5, **kwargs):
-        super(BoolformerLayer, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.threshold = threshold
 
     def build(self, input_shape):
@@ -25,7 +19,7 @@ class BoolformerLayer(layers.Layer):
 # Improved QLearningLayer with additional functionality
 class QLearningLayer(layers.Layer):
     def __init__(self, action_space_size, learning_rate=0.01, gamma=0.95, **kwargs):
-        super(QLearningLayer, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.action_space_size = action_space_size
         self.learning_rate = learning_rate
         self.gamma = gamma
@@ -59,28 +53,37 @@ def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout_rate=0.1):
     return layers.LayerNormalization(epsilon=1e-6)(attention_output + ffn_output)
 
 # Function to create and compile the neural network model
-def create_neural_network_model(seq_length, d_model, action_space_size):
+def create_neural_network_model(seq_length, d_model, num_classes):
     input_layer = keras.Input(shape=(seq_length, d_model))
 
-    pos_encoded = positional_encoding(seq_length, d_model) + input_layer
-    transformer_output = transformer_encoder(pos_encoded, head_size=32, num_heads=2, ff_dim=64)
+    # LSTM layer for handling sequential data in NLP tasks
+    x_lstm = layers.LSTM(128, return_sequences=True)(input_layer)
 
+    # Convolutional layer for processing kinematic data
+    x_conv = layers.Conv1D(filters=32, kernel_size=3, activation='relu')(x_lstm)
+
+    # Generate positional encoding and add it to the convolutional output
+    pos_encoding = positional_encoding(seq_length, d_model)
+    x_pos_encoded = x_conv + pos_encoding
+
+    # Transformer encoder with Conv1D output and positional encoding
+    transformer_output = transformer_encoder(x_pos_encoded, head_size=32, num_heads=2, ff_dim=64)
+
+    # Custom layers (Boolformer and QLearningLayer)
     x_bool = BoolformerLayer()(transformer_output)
-    rl_layer = QLearningLayer(action_space_size=action_space_size)(x_bool)
+    rl_layer = QLearningLayer(action_space_size=num_classes)(x_bool)
 
-    output_layer = layers.Dense(action_space_size, activation='softmax', name='Output')(rl_layer)
+    # Output layers
+    output_layer = layers.Dense(num_classes, activation='softmax', name='Output')(rl_layer)
     reward_layer = layers.Dense(1, name='Reward')(rl_layer)
 
+    # Constructing the model
     model = keras.Model(inputs=input_layer, outputs=[output_layer, reward_layer])
+
+    # Compiling the model
     opt = optimizers.Adam(learning_rate=0.001)
-    model.compile(optimizer=opt, loss={'Output': 'categorical_crossentropy', 'Reward': 'mean_squared_error'},
+    model.compile(optimizer=opt,
+                  loss={'Output': 'categorical_crossentropy', 'Reward': 'mean_squared_error'},
                   metrics={'Output': 'accuracy'})
 
     return model
-
-# Example of creating and compiling the model
-seq_length = 128  # Example sequence length
-d_model = 512     # Example dimension
-action_space_size = 10  # Example action space size
-
-model = create_neural_network_model(seq_length, d_model, action_space_size)
