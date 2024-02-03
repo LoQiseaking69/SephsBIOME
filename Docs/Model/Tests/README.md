@@ -8,7 +8,7 @@ The `SynthDgen.ipynb` notebook is designed to create a synthetic dataset that su
 
 The following visualizations provide a snapshot of the synthetic dataset's statistical properties and its comparative performance metrics:
 
-![Descriptive Statistics and Performance Metrics]([Docs/Model/Tests/IMG_6795.png](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/Model/Tests/IMG_6795.png))
+![Descriptive Statistics and Performance Metrics](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/Model/Tests/IMG_6795.png)
 
 
 The heatmap on the left displays descriptive statistics for each feature in the synthetic dataset, indicating the central tendency and spread of the data. The bar chart on the right compares the synthetic dataset's performance metrics against established benchmarks in NLP and robotic kinematics tasks, illustrating how the dataset measures up to current industry standards.
