@@ -1,13 +1,23 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+import random
+import string
+
+# Define a list of words for NLP data generation
+words = ["alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa"]
 
 def generate_synthetic_dataset(num_samples=1000, num_sensors=128, num_actions=10, noise_level=0.05):
     timestamps = [datetime.now() + timedelta(seconds=i) for i in range(num_samples)]
     data = {'timestamp': [timestamp.strftime('%Y-%m-%d %H:%M:%S') for timestamp in timestamps]}
     
+    # Enhanced NLP data generation
+    data['text_data'] = [' '.join(random.choices(words, k=5)) for _ in range(num_samples)]
+    
     for i in range(num_sensors):
-        sensor_data = np.random.uniform(-1, 1, num_samples)
+        # Introduce periodic trends in sensor data
+        period = np.random.randint(10, 100)
+        sensor_data = np.sin(np.linspace(0, 2 * np.pi * period, num_samples))
         noise = np.random.normal(0, noise_level, num_samples)
         data[f'sensor_{i}'] = sensor_data + noise
 
@@ -24,35 +34,32 @@ def feature_engineering(dataset, num_sensors=128, window_size=5):
     
     for i in range(num_sensors):
         col_name = f'sensor_{i}'
-        dataset[col_name] = normalize_column(dataset[col_name])
-        new_features[f'{col_name}_diff'] = dataset[col_name].diff().fillna(0)
-        new_features[f'{col_name}_roll_avg'] = dataset[col_name].rolling(window=window_size).mean().fillna(0)
-        new_features[f'{col_name}_exp_mov_avg'] = dataset[col_name].ewm(span=window_size).mean().fillna(0)
-
-    for i in range(0, num_sensors, 2):
-        if i + 1 < num_sensors:
-            new_features[f'sensor_{i}_{i+1}_interaction'] = dataset[f'sensor_{i}'] * dataset[f'sensor_{i+1}']
+        # Normalizing the entire column after computing diff, rolling, and ewm
+        normalized_col = normalize_column(dataset[col_name])
+        new_features[f'{col_name}_diff'] = normalized_col.diff().fillna(0)
+        new_features[f'{col_name}_roll_avg'] = normalized_col.rolling(window=window_size).mean().fillna(0)
+        new_features[f'{col_name}_exp_mov_avg'] = normalized_col.ewm(span=window_size).mean().fillna(0)
 
     new_feature_df = pd.DataFrame(new_features)
     return pd.concat([dataset, new_feature_df], axis=1)
 
 def reorganize_for_rl(dataset, num_sensors=128):
     sensor_columns = [f'sensor_{i}' for i in range(num_sensors)]
-    sensor_diff_columns = [f'sensor_{i}_diff' for i in range(num_sensors)]
-    sensor_roll_avg_columns = [f'sensor_{i}_roll_avg' for i in range(num_sensors)]
-    sensor_exp_mov_avg_columns = [f'sensor_{i}_exp_mov_avg' for i in range(num_sensors)]
     
-    dataset['sensor_mean'] = dataset[sensor_columns].mean(axis=1)
-    dataset['sensor_std'] = dataset[sensor_columns].std(axis=1)
-    dataset['sensor_diff_mean'] = dataset[sensor_diff_columns].mean(axis=1)
-    dataset['sensor_roll_avg_mean'] = dataset[sensor_roll_avg_columns].mean(axis=1)
-    dataset['sensor_exp_mov_avg_mean'] = dataset[sensor_exp_mov_avg_columns].mean(axis=1)
+    # Balancing the dataset for actions and rewards
+    action_counts = dataset['action'].value_counts()
+    min_count = action_counts.min()
+    balanced_dataset = pd.concat([dataset[dataset['action'] == action].sample(min_count) for action in action_counts.index])
     
-    # Drop individual sensor columns to simplify the dataset
-    drop_columns = sensor_columns + sensor_diff_columns + sensor_roll_avg_columns + sensor_exp_mov_avg_columns
-    dataset.drop(columns=drop_columns, inplace=True)
+    # Simplifying dataset
+    balanced_dataset['sensor_mean'] = balanced_dataset[sensor_columns].mean(axis=1)
+    balanced_dataset['sensor_std'] = balanced_dataset[sensor_columns].std(axis=1)
     
-    return dataset
+    # Drop less relevant columns to focus on key features
+    drop_columns = sensor_columns
+    balanced_dataset.drop(columns=drop_columns, inplace=True)
+    
+    return balanced_dataset
 
 # Generate the dataset
 synthetic_dataset = generate_synthetic_dataset()
