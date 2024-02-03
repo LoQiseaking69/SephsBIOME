@@ -2,19 +2,31 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers, optimizers
 
-# Custom Layer for Boolformer, with added threshold parameter
+# Custom Layer for Boolformer, with added trainable threshold and attention mechanism
 class BoolformerLayer(layers.Layer):
-    def __init__(self, threshold=0.5, **kwargs):
+    def __init__(self, embedding_dim=8, num_heads=2, threshold_init_value=0.5, **kwargs):
         super().__init__(**kwargs)
-        self.threshold = threshold
+        self.embedding_dim = embedding_dim
+        self.num_heads = num_heads
+        self.threshold_init_value = threshold_init_value
 
     def build(self, input_shape):
+        self.threshold = self.add_weight(
+            name='threshold',
+            shape=(input_shape[-1],),
+            initializer=tf.constant_initializer(self.threshold_init_value),
+            trainable=True
+        )
+        self.embedding_layer = layers.Embedding(input_dim=2, output_dim=self.embedding_dim)
+        self.attention_layer = layers.MultiHeadAttention(num_heads=self.num_heads, key_dim=self.embedding_dim)
         self.dense_layer = layers.Dense(input_shape[-1], activation='relu')
 
     def call(self, inputs):
         boolean_inputs = tf.greater(inputs, self.threshold)
-        logic_and = tf.math.logical_and(boolean_inputs, boolean_inputs)
-        return self.dense_layer(tf.cast(logic_and, tf.float32))
+        embeddings = self.embedding_layer(tf.cast(boolean_inputs, dtype=tf.int32))
+        attention_output = self.attention_layer(embeddings, embeddings)
+        attention_output_flat = tf.reshape(attention_output, [-1, attention_output.shape[1] * self.embedding_dim])
+        return self.dense_layer(attention_output_flat)
 
 # Improved QLearningLayer with additional functionality
 class QLearningLayer(layers.Layer):
@@ -50,7 +62,8 @@ def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout_rate=0.1):
     ffn_output = layers.Dense(ff_dim, activation="relu")(attention_output)
     ffn_output = layers.Dense(inputs.shape[-1])(ffn_output)
     ffn_output = layers.Dropout(dropout_rate)(ffn_output)
-    return layers.LayerNormalization(epsilon=1e-6)(attention_output + ffn_output)
+    encoder_output = layers.LayerNormalization(epsilon=1e-6)(attention_output + ffn_output)
+    return encoder_output
 
 # Function to create and compile the neural network model
 def create_neural_network_model(seq_length, d_model, num_classes):
