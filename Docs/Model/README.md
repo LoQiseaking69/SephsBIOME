@@ -32,8 +32,3 @@ This README outlines the plan for the ongoing development and optimization of th
 - Establishing robust testing cycles using simulations and real-world applications, fueled by SynthDgen's synthetic data.
 - Iterative refinement of the BoolFormer layer and the overall model, driven by performance metrics and insights derived from SynthDgen.
 
-## Conclusion
-This README serves as a dynamic guide for the continuous development and scaling of the BoolFormer layer. It underscores the strategic use of the SynthDgen script to generate sophisticated synthetic sensor data, ensuring the layer's adaptive performance in complex robotics applications.
-
-## How to Contribute
-Contributions to the BoolFormer layer's development are welcomed. Follow standard Git workflows: fork, clone, branch, commit, push, and create pull requests. Contributions that effectively utilize insights from SynthDgen's data generation and analysis are particularly encouraged.
