@@ -1,12 +1,11 @@
 
 ## Synthetic Dataset Generation for NLP and Robotic Kinematics (SynthDgen)
-
+![Gif banner](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/Model/Tests/IMG_6859.gif)
 # Overview
 The `SynthDgen.ipynb` notebook is designed to create a synthetic dataset that supports the development and training of models performing combined Natural Language Processing (NLP) and robotic kinematics tasks within a reinforcement learning framework. This notebook outlines the processes of synthetic data generation, feature engineering, and dataset restructuring, ensuring the data is well-suited for sophisticated machine learning applications.
 
 ## Dataset Analysis Visualization
 
-![Gif banner](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/Model/Tests/IMG_6859.gif)
 *The following visualizations provide a snapshot of the synthetic dataset's statistical properties and its comparative performance metrics:
 
 ![Descriptive Statistics and Performance Metrics](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/Model/Tests/IMG_6802.png)
