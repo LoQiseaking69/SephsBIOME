@@ -14,5 +14,5 @@ The following visualizations provide a snapshot of the synthetic dataset's stati
  
  *Said project is integrated as a module package, before it reflects the comparisons to benchmark metrics in relative fields, as `SynthDgen.ipynb` very strongly attempts to simulate.
 
-_________________🦠________________
+       __________🦠__________
  The heatmap on the left displays descriptive statistics for each feature in the synthetic dataset, indicating the central tendency and spread of the data. The bar chart on the right compares the synthetic dataset's performance metrics against established benchmarks in NLP and robotic kinematics tasks, illustrating how the dataset measures up to current industry standards.
