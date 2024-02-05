@@ -1,14 +1,12 @@
 import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras.models import Model
 from tensorflow.keras import layers, optimizers
+from tensorflow.keras.models import Model
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint
-from tensorflow.keras.layers import Dense, Embedding, MultiHeadAttention, LayerNormalization, Dropout, LSTM, Conv1D, Input, Bidirectional, Flatten
-from tensorflow.keras.initializers import Constant
+import random
+import numpy as np
 
-# Updated BoolformerLayer with LayerNormalization
+# BoolformerLayer implementation from neural_network.py
 class BoolformerLayer(layers.Layer):
     def __init__(self, embedding_dim=8, num_heads=2, threshold_init_value=0.5, **kwargs):
         super().__init__(**kwargs)
@@ -20,112 +18,119 @@ class BoolformerLayer(layers.Layer):
         self.threshold = self.add_weight(
             name='threshold',
             shape=(input_shape[-1],),
-            initializer=Constant(self.threshold_init_value),
+            initializer=tf.constant_initializer(self.threshold_init_value),
             trainable=True
         )
-        self.embedding_layer = Embedding(input_dim=2, output_dim=self.embedding_dim)
-        self.attention_layer = MultiHeadAttention(num_heads=self.num_heads, key_dim=self.embedding_dim)
-        self.attention_norm_layer = LayerNormalization(epsilon=1e-6)
-        self.dense_layer = Dense(input_shape[-1], activation='relu')
+        self.embedding_layer = layers.Embedding(input_dim=2, output_dim=self.embedding_dim)
+        self.attention_layer = layers.MultiHeadAttention(num_heads=self.num_heads, key_dim=self.embedding_dim)
+        self.dense_layer = layers.Dense(input_shape[-1], activation='relu')
 
     def call(self, inputs):
         boolean_inputs = tf.greater(inputs, self.threshold)
         embeddings = self.embedding_layer(tf.cast(boolean_inputs, dtype=tf.int32))
         attention_output = self.attention_layer(embeddings, embeddings)
-        attention_output_norm = self.attention_norm_layer(attention_output)
-        attention_output_flat = tf.reshape(attention_output_norm, shape=[-1, attention_output.shape[1] * self.embedding_dim])
+        attention_output_flat = tf.reshape(attention_output, [-1, attention_output.shape[1] * self.embedding_dim])
         return self.dense_layer(attention_output_flat)
 
-# Revised QLearningLayer with epsilon-greedy strategy and updated network
+# QLearningLayer implementation from neural_network.py
 class QLearningLayer(layers.Layer):
-    def __init__(self, action_space_size, state_size, learning_rate=0.01, gamma=0.95, epsilon=0.1, **kwargs):
+    def __init__(self, action_space_size, learning_rate=0.01, gamma=0.95, **kwargs):
         super().__init__(**kwargs)
         self.action_space_size = action_space_size
-        self.state_size = state_size
         self.learning_rate = learning_rate
         self.gamma = gamma
-        self.epsilon = epsilon
 
     def build(self, input_shape):
-        self.q_network = Dense(self.action_space_size)
+        self.q_table = tf.Variable(initial_value=tf.random.uniform([input_shape[-1], self.action_space_size], 0, 1), trainable=True)
 
     def call(self, state, action=None, reward=None, next_state=None):
-        q_values = self.q_network(state)
+        q_values = self.q_table(state)
 
         if action is not None and reward is not None and next_state is not None:
-            next_state_q_values = self.q_network(next_state)
-            target_q_value = reward + self.gamma * tf.reduce_max(next_state_q_values, axis=1)
+            future_rewards = tf.reduce_max(self.q_table(next_state), axis=1)
+            updated_q_values = reward + self.gamma * future_rewards
             mask = tf.one_hot(action, self.action_space_size)
 
             with tf.GradientTape() as tape:
-                current_q_values = self.q_network(state)
-                q_action = tf.reduce_sum(tf.multiply(current_q_values, mask), axis=1)
-                loss = tf.reduce_mean(tf.square(target_q_value - q_action))
+                current_q_values = tf.reduce_sum(tf.multiply(self.q_table(state), mask), axis=1)
+                loss = tf.keras.losses.mean_squared_error(updated_q_values, current_q_values)
 
-            grads = tape.gradient(loss, self.q_network.trainable_variables)
-            self.q_network.optimizer.apply_gradients(zip(grads, self.q_network.trainable_variables))
+            grads = tape.gradient(loss, self.q_table.trainable_variables)
+            self.optimizer.apply_gradients(zip(grads, self.q_table.trainable_variables))
 
-        action_probabilities = tf.nn.softmax(q_values, axis=1)
-        chosen_action = tf.cond(
-            tf.random.uniform([], 0, 1) < self.epsilon,
-            lambda: tf.random.uniform([tf.shape(state)[0]], 0, self.action_space_size, dtype=tf.int64),
-            lambda: tf.argmax(action_probabilities, axis=1)
-        )
-        return chosen_action
-
-# Updated positional encoding function with improved efficiency
-def positional_encoding(seq_length, d_model):
-    position = tf.range(seq_length, dtype=tf.float32)[:, tf.newaxis]
-    div_term = tf.exp(tf.range(0, d_model // 2, dtype=tf.float32) * -(tf.math.log(10000.0) / d_model))
-    pos_encoding = position * div_term
-    sin_cos_encoding = tf.concat([tf.sin(pos_encoding), tf.cos(pos_encoding)], axis=-1)
-    return sin_cos_encoding[tf.newaxis, ...]
-
-# Enhanced transformer encoder with parameter flexibility
-def transformer_encoder(inputs, head_size, num_heads, ff_dim, dropout_rate=0.1):
-    attention_output = layers.MultiHeadAttention(key_dim=head_size, num_heads=num_heads, dropout=dropout_rate)(inputs, inputs)
-    attention_output = layers.Dropout(dropout_rate)(attention_output)
-    attention_output = layers.LayerNormalization(epsilon=1e-6)(inputs + attention_output)
-
-    ffn_output = layers.Dense(ff_dim, activation="relu")(attention_output)
-    ffn_output = layers.Dense(inputs.shape[-1])(ffn_output)
-    ffn_output = layers.Dropout(dropout_rate)(ffn_output)
-    return layers.LayerNormalization(epsilon=1e-6)(attention_output + ffn_output)
+        return q_values
 
 # Function to create and compile the neural network model
-def create_neural_network_model(seq_length, d_model, num_classes):
-    input_layer = Input(shape=(seq_length, d_model))
-
-    pos_encoding = positional_encoding(seq_length, 32)
-
-    x_lstm = Bidirectional(LSTM(128, return_sequences=True))(input_layer)
-    x_conv = Conv1D(filters=32, kernel_size=3, padding='same', activation='relu')(x_lstm)
-
-    x_pos_encoded = x_conv + pos_encoding
-
-    transformer_output = transformer_encoder(x_pos_encoded, head_size=32, num_heads=2, ff_dim=64)
-
-    state_size = transformer_output.shape[1] * transformer_output.shape[2]
-    x_bool = BoolformerLayer()(transformer_output)
-    rl_layer = QLearningLayer(action_space_size=num_classes, state_size=state_size)(x_bool)
-
-    # Flatten the output from QLearningLayer before final dense layers
-    reshaped_output = Flatten()(rl_layer)
-
-    output_layer = Dense(num_classes, activation='softmax', name='Output')(reshaped_output)
-    reward_layer = Dense(1, name='Reward')(reshaped_output)
-
-    model = Model(inputs=input_layer, outputs=[output_layer, reward_layer])
-
-    opt = optimizers.Adam(learning_rate=0.001)
-    model.compile(optimizer=opt,
-                  loss={'Output': 'categorical_crossentropy', 'Reward': 'mean_squared_error'},
-                  metrics={'Output': 'accuracy'})
-
+def create_neural_network_model(seq_length, d_model, num_classes, genome):
+    input_layer = layers.Input(shape=(seq_length, d_model))
+    
+    x = BoolformerLayer(embedding_dim=genome.embedding_dim, num_heads=genome.num_heads)(input_layer)
+    x = QLearningLayer(action_space_size=num_classes)(x)
+    
+    output_layer = layers.Dense(num_classes, activation='softmax')(x)
+    model = Model(inputs=input_layer, outputs=output_layer)
+    
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
     return model
 
-seq_length = 128
-d_model = 512
-num_classes = 10
+# Gene implementation from genome.py
+class Gene:
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
 
-model = create_neural_network_model(seq_length, d_model, num_classes)
+# Genome implementation from genome.py
+class Genome:
+    def __init__(self):
+        self.genes = {}
+
+    def add_gene(self, name, value):
+        self.genes[name] = Gene(name, value)
+
+# Evolution implementation from evolution.py
+class Evolution:
+    def __init__(self, population_size, mutation_rate, crossover_rate):
+        self.population_size = population_size
+        self.mutation_rate = mutation_rate
+        self.crossover_rate = crossover_rate
+        self.population = [self.create_random_genome() for _ in range(population_size)]
+
+    def create_random_genome(self):
+        genome = Genome()
+        # Example of adding genes
+        genome.add_gene('embedding_dim', random.randint(5, 10))
+        genome.add_gene('num_heads', random.choice([2, 4, 8]))
+        return genome
+
+    # Example method for evolving population
+    def evolve(self):
+        # Implement evolution logic such as selection, crossover, and mutation
+        # ...
+
+# Main function for evolving learning loop
+def main():
+    # Load and preprocess dataset
+    # Example placeholder for dataset loading and preprocessing
+    # X, y = load_data()
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    # scaler = StandardScaler()
+    # X_train = scaler.fit_transform(X_train)
+    # X_test = scaler.transform(X_test)
+
+    # Initialize the genetic algorithm
+    evolution = Evolution(population_size=100, mutation_rate=0.01, crossover_rate=0.7)
+
+    # Evolving Learning Loop
+    num_generations = 20
+    for generation in range(num_generations):
+        for genome in evolution.population:
+            model = create_neural_network_model(seq_length, d_model, num_classes, genome)
+            model.fit(X_train, y_train, epochs=10)
+            _, accuracy = model.evaluate(X_test, y_test)
+            genome.fitness = accuracy
+
+        evolution.evolve()
+        print(f'Generation {generation} completed')
+
+if __name__ == "__main__":
+    main()
