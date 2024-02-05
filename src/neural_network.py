@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras.models import Model
 from tensorflow.keras import layers, optimizers
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
