@@ -12,7 +12,7 @@ The following visualizations provide a snapshot of the synthetic dataset's stati
 
  `(Disclaimer: To be fully realized, in terms of conceptually novel, yet advantageous, methods of the BoolFormer Class and certain integral layers need to be incorporated properly; For recompiling, the actual RL Model `SephsModelV4.ipynb` Parameters, employed primarily at the core of The `SephsBIOME` project as well as the overall "SephaROS System".` 
  
- *Said project is integrated as a module package, before it reflects the comparisons to benchmark metrics in relative fields, as `SynthDgen.ipynb` very strongly attempts to simulate.)`
+ *Said project is integrated as a module package, before it reflects the comparisons to benchmark metrics in relative fields, as `SynthDgen.ipynb` very strongly attempts to simulate.
 
 _________________🦠________________
  The heatmap on the left displays descriptive statistics for each feature in the synthetic dataset, indicating the central tendency and spread of the data. The bar chart on the right compares the synthetic dataset's performance metrics against established benchmarks in NLP and robotic kinematics tasks, illustrating how the dataset measures up to current industry standards.
