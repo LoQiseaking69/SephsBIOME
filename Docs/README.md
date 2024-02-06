@@ -1,6 +1,6 @@
 # 📁 Docs Directory
 
-Welcome to the 🧠 knowledge hub of the SephsBIOME project. This is where we document my voyage through the complex landscapes of computational biology and machine learning.
+Welcome to the 🧠 knowledge hub of the SephsBIOME project. This is where I document my voyage through the complex landscapes of computational biology and machine learning.
 
 ## Inside the Docs:
 
