@@ -18,7 +18,7 @@ The `src` directory is the central nervous system of SephsBIOME, containing the 
 
 - `performanceViz.py`: 📊 Script for visualizing the performance metrics of the models over time.
 
-- `sensor_data.py`: 📡 Manages the generation and processing of synthetic sensor data for simulations.
+- `sensor_data.py`: 📡 Manages the processing of actual sensor data or synthetic for simulations.
 
 - `simulator.py`: 🌐 Simulates the environment in which the digital organisms (*RL Agents adapted for simulated action space via network model iteration; evolving, through simulated cummulative reward via optimized synthetic data AND real-time sensor input for NLP and kinematic behavior model optimization via GA over time) to re-inforce data interaction VIA ROS2 and evolve state adaptability and informed responses...
 
