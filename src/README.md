@@ -1,25 +1,25 @@
 # 🧬 SephsBIOME Source Code Directory
 
-The `src` directory is the central nervous system of SephsBIOME, containing the Python scripts that drive our project's functionality. 🧠💻
+The `src` directory is the central nervous system of SephsBIOME, containing the Python scripts that drive my project's functionality. 🧠💻
 
 ## Files and their purpose:
 
-- `bipedal_robot.py`: 🤖 The script that defines the mechanics and control algorithms of our simulated bipedal robots.
+- `bipedal_robot.py`: 🤖 The script that defines the mechanics and control algorithms of my simulated bipedal robots.
 
-- `evolution.py`: 🧬 Contains our evolutionary strategy logic, managing the selection and mutation processes to evolve our models.
+- `evolution.py`: 🧬 Contains my evolutionary strategy logic, managing the selection and mutation processes to evolve the models.
 
-- `genome.py`: 📜 Holds the definitions for the genetic encoding of traits within our synthetic organisms.
+- `genome.py`: 📜 Holds the definitions for the genetic encoding of traits within synthetic organisms.
 
-- `individual.py`: 👤 Represents an individual entity within our simulations, tying together the genome and the neural network.
+- `individual.py`: 👤 Represents an individual entity within the simulations, tying together the genome and the neural network.
 
-- `main.py`: 🚀 The entry point for running our simulations, orchestrating the flow from initialization to execution.
+- `main.py`: 🚀 The entry point for running the simulations, orchestrating the flow from initialization to execution.
 
 - `neural_network.py`: 🧠 Defines the neural network architectures, including layers and training procedures.
 
-- `performanceViz.py`: 📊 Script for visualizing the performance metrics of our models over time.
+- `performanceViz.py`: 📊 Script for visualizing the performance metrics of the models over time.
 
-- `sensor_data.py`: 📡 Manages the generation and processing of synthetic sensor data for our simulations.
+- `sensor_data.py`: 📡 Manages the generation and processing of synthetic sensor data for simulations.
 
-- `simulator.py`: 🌐 Simulates the environment in which our digital organisms interact and evolve.
+- `simulator.py`: 🌐 Simulates the environment in which the digital organisms (*RL Agents adapted for simulated action space; evolving, through simulated cummulative reward, and real-time sensor input for NLP and kinematic behavior model optimization over time) to reinforce data interaction and evolve state adaptability and informed responses.
 
 Embrace the code that simulates life itself. Dive in! 🌊
