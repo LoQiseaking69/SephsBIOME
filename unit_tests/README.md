@@ -1,4 +1,4 @@
-# Unit Tests for SephsBIOME
+# 🐞Unit Tests for SephsBIOME
 
 This `unit_tests` directory contains unit test scripts for the SephsBIOME project, critical for verifying the functionality of individual code segments.
 
