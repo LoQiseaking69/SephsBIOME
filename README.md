@@ -23,7 +23,7 @@ git clone 'https://github.com/LoQiseaking69/SephsBIOME.git'
 cd SephsBIOME
 ```
 
-
+😂*when it's complete...
 ### Running the Project
 Start the project using:
 ```bash
