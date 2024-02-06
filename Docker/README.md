@@ -14,9 +14,9 @@ To get started with the Docker container for SephsBIOME, you will need to have D
 
 To build the Docker image, run the following command in this directory:
 
-\```bash
+\`\`\`bash
 docker build -t sephsbiome .
-\```
+\`\`\`
 
 This will read the Dockerfile and build the image, tagging it as `sephsbiome`.
 
@@ -24,9 +24,9 @@ This will read the Dockerfile and build the image, tagging it as `sephsbiome`.
 
 Once the image is built, you can run the container using:
 
-\```bash
+\`\`\`bash
 docker run -d -p 8000:8000 sephsbiome
-\```
+\`\`\`
 
 This will start a container running the SephsBIOME application, accessible at `localhost:8000`.
 
