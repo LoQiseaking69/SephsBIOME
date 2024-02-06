@@ -1,23 +1,41 @@
-# GitHub Workflows for SephsBIOME
-
-This `.github/workflows` directory contains workflow files for GitHub Actions, which are used to automate the SephsBIOME project's continuous integration and deployment (CI/CD) pipeline.
+# Seph's Biome
 
 ## Overview
 
-The `main.yml` file is the central workflow configuration for this project. It defines the series of steps that GitHub will execute when certain conditions are met, such as when a new commit is pushed to the repository.
+Seph's Biome is an ongoing endeavor to create a cutting-edge robotic operating system at the intersection of robotics, computer science, and evolutionary biology. Initially Inspired by David Miller's bioSim project and Stephen D’Ascoli's thesis on symbolic Boolean regression, this project delves into the world of artificial evolution, aiming to replicate and analyze complex biological behaviors within a computational framework.
 
-## Workflow Description
+### Leading Inspirations
+- **bioSim by David Miller**: [YouTube video](https://youtu.be/N3tRFayqVtk)
+- **Symbolic Boolean Regression by Stephen D’Ascoli**: D'Ascoli, S. (2023). Boolformer: Symbolic Regression of Logic Functions with Transformers. Retrieved from [https://sdascoli.github.io/](https://sdascoli.github.io/)
 
-- `main.yml`: This file contains the definition for the project's main CI/CD pipeline. It likely includes steps for checking out the code, running tests, building the project, and possibly deploying it to a server or publishing it to a package registry.
+## Getting Started
 
-## Usage
+### Prerequisites
+- Python - latest release 
+- ROS Noetic (to be updated to Foxy)
+- Docker (optional)
 
-To trigger the workflow, you can typically push changes to a specific branch, create a pull request, or use other events specified in `main.yml`.
+### Setup
+Clone the repository and navigate to the directory:
+```bash
+git clone 'https://github.com/LoQiseaking69/SephsBIOME.git'
+cd SephsBIOME
+```
 
-## Customizing Workflows
+😂*when it's complete...
+### you can Run the Project by
+Starting the project using:
+```bash
+python3 main.py
+```
 
-You can create additional `.yml` files to extend the automation. Each file represents a separate workflow that can be tailored to different processes such as building branches, handling releases, or managing pull requests.
+## Capabilities and Goals
 
-## Support
+Seph's Biome combines principles from robotics, AI, and biology to achieve:
+- **Robotic Simulation**: Utilizing ROS for simulating realistic robotic behaviors in various environments or simulations.
+- **Evolutionary Algorithms**: Implementing genetic algorithms to evolve complex robotic behaviors.
+- **Neural Network Integration**: Incorporating neural networks for decision-making and adaptive learning.
+- **Real-Time Data Handling**: Managing sensor data essential for real-time decisions and performance analysis.
+- **Dynamic Visualization**: Providing real-time visualization of key metrics to aid in understanding and analyzing the evolutionary processes.
 
-For any questions or issues related to these workflows, please refer to the repository's Issues section or the documentation on [GitHub Actions](https://docs.github.com/en/actions).
+The overarching goal is to create a self-evolving robotic system, emulating and enhancing biological processes and behaviors.
