@@ -23,16 +23,16 @@ To contribute new unit tests, please adhere to the following:
 
 Execute the unit tests by running:
 
-\`\`\`bash
+```bash
 python -m unittest BR_unittest.py
 python -m unittest ev_unittest.py
-\`\`\`
+```
 
 You can also run all tests in the directory using:
 
-\`\`\`bash
+```bash
 python -m unittest discover
-\`\`\`
+```
 
 ## Call for Contributions
 
