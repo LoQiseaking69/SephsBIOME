@@ -9,7 +9,7 @@ This `unit_tests` directory contains unit test scripts for the SephsBIOME projec
 
 ## Need for More Tests
 
-The current test suite is a work in progress, and we require more tests to achieve comprehensive coverage. Contributors are invited to write additional tests, especially for modules that lack them.
+The current test suite is a work in progress, and I require more tests to achieve comprehensive coverage. Contributors are invited to write additional tests, especially for modules that lack them.
 
 ### Writing New Tests
 
@@ -36,7 +36,7 @@ python -m unittest discover
 
 ## Call for Contributions
 
-We appeal to all contributors to assist in expanding our unit test coverage. By doing so, you help us maintain the quality and robustness of the SephsBIOME project.
+I appeal to any contributor to assist in expanding my unit test coverage. By doing so, you help me maintain the quality and robustness of the SephsBIOME project.
 
 ## Support and Collaboration
 
