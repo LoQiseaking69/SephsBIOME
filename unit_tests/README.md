@@ -3,7 +3,7 @@
 This `unit_tests` directory contains unit test scripts for the SephsBIOME project, critical for verifying the functionality of individual code segments.
 
 ## Current Tests
-
+*(under development)*
 - `BR_unittest.py`: Contains unit tests for the `bipedal_robot.py` module, ensuring that the bipedal robot functionalities are working as intended.
 - `ev_unittest.py`: Contains unit tests for the evolutionary algorithms used in the project to simulate and evaluate adaptive behaviors.
 
