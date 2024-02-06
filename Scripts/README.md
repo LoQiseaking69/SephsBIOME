@@ -16,5 +16,3 @@ chmod +x setup_sephsbiome.sh
 - 📡 Checks system compatibility
 - 📦 Installs all cyber essentials
 - 🌐 Sets up the neural simulation environment
-
-👾 Embrace the synthesis of technology and evolution. Let's code life!
