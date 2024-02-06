@@ -6,7 +6,7 @@ The `SynthDgen.ipynb` notebook is designed to create a synthetic dataset that su
 
 ## Dataset Analysis Visualization
 
-*The following visualizations provide a snapshot of the synthetic dataset's statistical properties and its comparative performance metrics:
+*The following visualizations provide a snapshot of the synthetic dataset's statistical properties and its comparative performance metrics using the generated synthetic_datasetV2.csv:
 
 ![Descriptive Statistics and Performance Metrics](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/Model/Tests/IMG_6802.png)
 
