@@ -25,7 +25,7 @@ cd SephsBIOME
 
 😂*when it's complete...
 ### you can Run the Project by
-Start the project using:
+Starting the project using:
 ```bash
 python3 main.py
 ```
