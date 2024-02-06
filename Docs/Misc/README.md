@@ -4,7 +4,7 @@ This subdirectory within 'Docs' is the eclectic collection of SephsBIOME's ancil
 
 ## What's Inside:
 
-- `AperiodicSeph.ipynb`: 📓 An exploratory Jupyter notebook diving into the aperiodic behavior patterns of the models.
+- `AperiodicSeph.ipynb`: 📓 An exploratory Jupyter notebook, diving into an initial hypothosis for exploring aperiodic pattern re-integration; potentially via classification or encoding with GA optimization to enhance the models through identifying aperiodic patterns with benificial constants.
 
 - `LICENCE.md`: 📜 The legal document detailing how the material can be used, modified, and distributed.
 
