@@ -7,7 +7,6 @@ The BoolFormer architecture is based on the seminal thesis by `Stéphane d'Ascol
 
 ![BoolFormer Logic Tree](BoolFormer_Optimization.png)
 <sub><sup><span style="color:blue">
-
 Note: The BoolFormer class depicted above might be fully realized for application toward symbolic boolean regression; though, for this, it is in the prototype stage and has not been fully optimized or finalized for production use.
 </span></sup></sub>
 
