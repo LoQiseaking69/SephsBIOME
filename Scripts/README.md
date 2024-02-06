@@ -7,10 +7,10 @@
 This script is your gateway to our cybernetic sanctuary. With a simple run, it primes your system to delve into the realm of evolutionary computation and synthetic intelligence.
 
 ### Quickstart:
-\```sh
+```sh
 chmod +x setup_sephsbiome.sh
 ./setup_sephsbiome.sh
-\```
+```
 
 ### What it does:
 - 📡 Checks system compatibility
