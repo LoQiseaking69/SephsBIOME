@@ -4,13 +4,13 @@ The `src` directory is the central nervous system of SephsBIOME, containing the 
 
 ## Files and their purpose:
 
-- `bipedal_robot.py`: 🤖 The script that defines the mechanics and control algorithms of my simulated bipedal robots.
+- `bipedal_robot.py`: 🤖 The script that defines the mechanics and control algorithms of Physical sensor and actuator data; for bipedal robots, as well as, the PID/physics and actuation of simulated robots.
 
-- `evolution.py`: 🧬 Contains my evolutionary strategy logic, managing the selection and mutation processes to evolve the models.
+- `evolution.py`: 🧬 Contains the evolutionary strategy logic, managing the selection and mutation processes to evolve the models.
 
-- `genome.py`: 📜 Holds the definitions for the genetic encoding of traits within synthetic organisms.
+- `genome.py`: 📜 Holds the definitions for the genetic encoding of traits within synthetic RL Agents.
 
-- `individual.py`: 👤 Represents an individual entity within the simulations, tying together the genome and the neural network.
+- `individual.py`: 👤 Represents an individual RL agent within the simulations, tying together the genome and the neural network.
 
 - `main.py`: 🚀 The entry point for running the simulations, orchestrating the flow from initialization to execution.
 
