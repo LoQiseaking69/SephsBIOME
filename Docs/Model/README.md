@@ -1,7 +1,7 @@
 # "BoolFormer" Layer Optimization with SynthDgen Integration
 
 ## Overview
-Welcome to the BoolFormer Layer Optimization documentation. This README outlines the strategy for enhancing the BoolFormer layer within our neural network models, designed for the symbolic regression of logical functions. With the recent integration of an attention mechanism and a trainable threshold, we utilize the SynthDgen script to generate synthetic sensor data, which is essential for training and refining the BoolFormer layer.
+Welcome to the BoolFormer Layer Optimization documentation. This README outlines the strategy for enhancing the BoolFormer layer within my neural network models, designed for the symbolic regression of logical functions. With the recent integration of an attention mechanism and a trainable threshold, I utilize the SynthDgen script to generate synthetic sensor data, which is essential for training and refining the BoolFormer layer.
 _______________________________________
 The BoolFormer architecture is based on the seminal thesis by `Stéphane d'Ascoli`. His research provides a methodological foundation for the development of this project.
 
