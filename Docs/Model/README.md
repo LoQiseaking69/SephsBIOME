@@ -7,7 +7,9 @@ The BoolFormer architecture is based on the seminal thesis by `Stéphane d'Ascol
 
 ![BoolFormer Logic Tree](BoolFormer_Optimization.png)
 <sub><sup><span style="color:blue">
-Note: The BoolFormer class depicted above might be fully realized for application toward symbolic boolean regression; though, for this, it is in the prototype stage and has not been fully optimized or finalized for production use.</span></sup></sub>
+
+Note: The BoolFormer class depicted above might be fully realized for application toward symbolic boolean regression; though, for this, it is in the prototype stage and has not been fully optimized or finalized for production use.
+</span></sup></sub>
 
 ## Acknowledgements
 I would like to acknowledge the significant contribution of Stéphane d'Ascoli, whose thesis on BoolFormer architecture for symbolic Boolean regression has been a critical resource. The thesis titled "Boolformer: Symbolic Regression of Logic Functions with Transformers," co-authored with Samy Bengio, Josh Susskind, and Emmanuel Abbé, has been instrumental in the conceptualization of this layer.
