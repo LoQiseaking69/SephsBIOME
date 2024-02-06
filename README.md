@@ -23,18 +23,6 @@ git clone 'https://github.com/LoQiseaking69/SephsBIOME.git'
 cd SephsBIOME
 ```
 
-### Using Docker
-To build and run the project using Docker:
-```bash
-docker build -t sephsbiome .
-docker run -it sephsbiome
-```
-
-### Automatic Setup
-Run the setup script:
-```bash
-./setup_sephsbiome.sh
-```
 
 ### Running the Project
 Start the project using:
