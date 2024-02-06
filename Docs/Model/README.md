@@ -3,14 +3,13 @@
 ## Overview
 Welcome to the BoolFormer Layer Optimization documentation. This README outlines the strategy for enhancing the BoolFormer layer within our neural network models, designed for the symbolic regression of logical functions. With the recent integration of an attention mechanism and a trainable threshold, we utilize the SynthDgen script to generate synthetic sensor data, which is essential for training and refining the BoolFormer layer.
 _______________________________________
-The BoolFormer architecture is based on the seminal thesis by Stéphane d'Ascoli. His research provides a methodological foundation for the development of this project.
+The BoolFormer architecture is based on the seminal thesis by `Stéphane d'Ascoli`. His research provides a methodological foundation for the development of this project.
 
-![BoolFormer Logic Tree](BoolFormer_Optimization.png)
-
-*The logic tree visualizes the decision-making process within the BoolFormer layer, illustrating the complex interplay between various states and inputs.*
+!![BoolFormer Logic Tree](BoolFormer_Optimization.png)
+<sub><sup><span style="color:blue">Note: The BoolFormer class depicted above is in the prototype stage and has not been fully optimized or finalized for production use.</span></sup></sub>
 
 ## Acknowledgements
-I would like to acknowledge the significant contribution of Stéphane d'Ascoli, whose thesis on BoolFormer architecture for symbolic Boolean regression has been a critical resource. The thesis titled "Boolformer: Symbolic Regression of Logic Functions with Transformers," co-authored with Samy Bengio, Josh Susskind, and Emmanuel Abbé, and published in January 2023, has been instrumental in the conceptualization of this layer.
+I would like to acknowledge the significant contribution of Stéphane d'Ascoli, whose thesis on BoolFormer architecture for symbolic Boolean regression has been a critical resource. The thesis titled "Boolformer: Symbolic Regression of Logic Functions with Transformers," co-authored with Samy Bengio, Josh Susskind, and Emmanuel Abbé, has been instrumental in the conceptualization of this layer.
 
 ## Key Components
 - **BoolFormer Layer**: A custom TensorFlow layer with advanced data processing capabilities for symbolic regression in robotics applications.
