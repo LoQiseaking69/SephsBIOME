@@ -1,7 +1,7 @@
 # 🚀 Model Evolution Chronicles - Versions Directory
 
 This directory holds the evolution of the SephsBIOME project's models, with each Jupyter notebook representing a distinct version.
-
+![Banner](
 ## Directory Overview:
 
 - `SephModelV4.ipynb`: 🔄 Version 4 introduces new feature integrations and enhancements to the optimization process, significantly improving model performance.
