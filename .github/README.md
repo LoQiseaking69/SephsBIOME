@@ -35,4 +35,4 @@ Seph's Biome integrates concepts from robotics, AI, and biology, aiming to achie
 - **Real-Time Data Handling**: Efficient management of sensor data, crucial for real-time decision-making and performance monitoring. ⏱️
 - **Dynamic Visualization**: Offering real-time visualization tools for a deeper understanding and analysis of evolutionary dynamics. 📊
 
-The ultimate ambition of Seph's Biome is to develop a self-evolving robotic system that mirrors and augments natural biological processes and behaviors by the iteritive refinement of its employed GA for extensive multimodal hyperparameter tuning of its RL model; and, to include unsupervised learning.🌱🤖
+The ultimate ambition of Seph's Biome is to develop a self-evolving robotic system that mirrors and augments natural biological processes and behaviors by the iteritive refinement of its employed GA for extensive multimodal hyperparameter tuning of its RL model; to a point, that the entire system is optimized by the GA at its core for multimodal functionality in a robotics context.🌱🤖
