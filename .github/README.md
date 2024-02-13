@@ -1,5 +1,7 @@
 # Seph's Biome 🌿🤖
 
+![Seph's Biome](https://example.com/path/to/image.png)
+
 ## Overview
 
 Seph's Biome represents a pioneering venture in the realm of robotic operating systems, blending the intricacies of robotics, computer science, and evolutionary biology. The project focuses on the exploration of artificial evolution, with the objective of replicating and analyzing complex biological behaviors in a computational environment.
@@ -24,15 +26,19 @@ Start the project using:
 ```bash
 python3 main.py
 ```
-although, i plan to provide an executable .sh or something, upon 
-release... 😅haven't gotten that far.
+An executable script (.sh) is planned for ease of use upon release. 😅
+
+## Evolution of AI Integration 🌐🔧
+
+Seph's Biome is evolving its AI strategy, transitioning from a custom model passed to the Genetic Algorithm (GA) at runtime for real-time optimization, to a more sophisticated approach. This new phase involves employing a Deep Q-Network (DQN) pre-trained in the Bipedal Walker environment in Gym. This pre-trained model is then fine-tuned and optimized using the GA component designed for dynamic, runtime adjustments. This shift allows for more efficient and effective learning and adaptation in robotic behaviors.
+
 ## Capabilities and Goals 🎯
 
 Seph's Biome integrates concepts from robotics, AI, and biology, aiming to achieve:
 - **Robotic Simulation**: Employing ROS to simulate realistic robotic behaviors across different scenarios. 🤖
-- **Evolutionary Algorithms**: Using genetic algorithms to foster the evolution of intricate robotic behaviors. 🧬
-- **Neural Network Integration**: Embedding neural networks for enhanced decision-making and adaptive learning. 🧠
-- **Real-Time Data Handling**: Efficient management of sensor data, crucial for real-time decision-making and performance monitoring. ⏱️
-- **Dynamic Visualization**: Offering real-time visualization tools for a deeper understanding and analysis of evolutionary dynamics. 📊
+- **Evolutionary Algorithms for Real-Time Optimization**: Implementing genetic algorithms to evolve and optimize complex robotic behaviors, now enhanced by integrating pre-trained DQN models for more effective learning. 🧬
+- **Neural Network Integration**: Embedding advanced neural networks for decision-making and adaptive learning, leveraging the synergy between DQN and GA. 🧠
+- **Real-Time Data Handling**: Managing sensor data essential for real-time decisions and performance analysis. ⏱️
+- **Dynamic Visualization**: Providing real-time visualization of key metrics to aid in understanding and analyzing the evolutionary and learning processes. 📊
 
-The ultimate ambition of Seph's Biome is to develop a self-evolving robotic system that mirrors and augments natural biological processes and behaviors by the iteritive refinement of its employed GA for extensive multimodal hyperparameter tuning of its RL model; to a point, that the entire system is optimized by the GA at its core for multimodal functionality in a robotics context.🌱🤖
+The overarching goal is to create a self-evolving robotic system, emulating and enhancing biological processes and behaviors through iterative refinement of its GA for extensive multimodal hyperparameter tuning of its RL model, leading to an optimized system for multimodal functionality in a robotics context. 🌱🤖
