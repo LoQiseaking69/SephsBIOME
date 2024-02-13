@@ -24,7 +24,7 @@ Start the project using:
 ```bash
 python3 main.py
 ```
-
+although, i plan to provide an executable upon release...
 ## Capabilities and Goals 🎯
 
 Seph's Biome integrates concepts from robotics, AI, and biology, aiming to achieve:
