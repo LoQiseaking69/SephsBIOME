@@ -5,9 +5,6 @@
 
 Seph's Biome is an ongoing endeavor to create a cutting-edge robotic operating system at the intersection of robotics, computer science, and evolutionary biology. Initially Inspired by David Miller's bioSim project and Stephen D’Ascoli's thesis on symbolic Boolean regression, this project delves into the world of artificial evolution, aiming to replicate and analyze complex biological behaviors within a computational framework.
 
-### Leading Inspirations
-- **bioSim by David Miller**: [YouTube video](https://youtu.be/N3tRFayqVtk)
-- **Symbolic Boolean Regression by Stephen D’Ascoli**: D'Ascoli, S. (2023). Boolformer: Symbolic Regression of Logic Functions with Transformers. Retrieved from [https://sdascoli.github.io/](https://sdascoli.github.io/)
 
 ## Getting Started
 
