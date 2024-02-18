@@ -1,6 +1,8 @@
 # Seph's Biome 🌿🤖
 
-![Seph's Biome](https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/Misc/IMG_6917.jpg)
+<div style="text-align:center;">
+    <img src="https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/Misc/IMG_6917.jpg" alt="Seph's Biome">
+</div>
 
 ## Overview
 
