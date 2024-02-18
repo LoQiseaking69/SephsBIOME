@@ -10,4 +10,9 @@ In the `Misc` folder, you'll find a collection of my project's creative chaos �
 ### 📊 Model
 Venture into the `Model` folder to unravel the fabric of my AI models. Detailed documentation 📚 on the neural network architectures, evolutionary strategies, and simulation protocols awaits you. It's the storyboard where my data narratives take shape.
 
+### Scripts 🚀
+
+setup_sephsbiome.sh
+This script is your gateway to our cybernetic sanctuary. With a simple run, it primes your system to delve into the realm of evolutionary computation and synthetic intelligence.
+
 Each document is a gateway to understanding the intricate workings of SephsBIOME.
