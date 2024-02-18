@@ -3,6 +3,7 @@
 <p align="center">
   <img src="https://github.com/LoQiseaking69/SephsBIOME/blob/master/Docs/Misc/IMG_6917.jpg" alt="Seph's Biome">
 </p>
+
 ## Overview
 
 Seph's Biome represents a pioneering venture in the realm of robotic operating systems, blending the intricacies of robotics, computer science, and evolutionary biology. The project focuses on the exploration of artificial evolution, with the objective of replicating and analyzing complex biological behaviors in a computational environment.
