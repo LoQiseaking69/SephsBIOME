@@ -35,7 +35,14 @@ for the "GA" management and tuning *(that is, The SephsBIOME Project)* is locate
 
 ## Evolution of AI Integration 🌐🔧
 
-Seph's Biome is evolving its AI strategy, transitioning from a custom model passed to the Genetic Algorithm (GA) at runtime for real-time optimization, to a more sophisticated approach. This new phase involves employing a Deep Q-Network (DQN) pre-trained in the Bipedal Walker environment in Gym. This pre-trained model is then fine-tuned and optimized using the GA component designed for dynamic, runtime adjustments. This shift allows for more efficient and effective learning and adaptation in robotic behaviors.
+Seph's Biome is now integrating a more sophisticated AI approach, utilizing a neural network model comprising an RBM Layer and a Q-Learning Layer. This model is designed to learn and adapt to complex environments, such as the BipedalWalker-v3 environment in Gym.
+
+The new model architecture includes:
+- **RBM Layer**: Responsible for feature extraction and representation learning from the input data.
+- **QLearning Layer**: Utilized for reinforcement learning and decision-making, optimizing actions based on learned rewards and penalties.
+
+This integration marks a significant advancement in Seph's Biome, enhancing its ability to learn and adapt to dynamic environments, leading to more effective and robust robotic behaviors.
+
 
 ## Capabilities and Goals 🎯
 
