@@ -30,6 +30,9 @@ python3 main.py
 ```
 An executable script (.sh) is planned for ease of use upon release. 😅
 
+# The initial modal
+for the "GA" management and tuning *(that is, The SephsBIOME Project)* is located at [this repository; for isolating building and testing](https://github.com/LoQiseaking69/SephMV)
+
 ## Evolution of AI Integration 🌐🔧
 
 Seph's Biome is evolving its AI strategy, transitioning from a custom model passed to the Genetic Algorithm (GA) at runtime for real-time optimization, to a more sophisticated approach. This new phase involves employing a Deep Q-Network (DQN) pre-trained in the Bipedal Walker environment in Gym. This pre-trained model is then fine-tuned and optimized using the GA component designed for dynamic, runtime adjustments. This shift allows for more efficient and effective learning and adaptation in robotic behaviors.
