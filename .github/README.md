@@ -46,11 +46,17 @@ This integration marks a significant advancement in Seph's Biome, enhancing its 
 
 ## Capabilities and Goals 🎯
 
-Seph's Biome integrates concepts from robotics, AI, and biology, aiming to achieve:
-- **Robotic Simulation**: Employing ROS to simulate realistic robotic behaviors across different scenarios. 🤖
-- **Evolutionary Algorithms for Real-Time Optimization**: Implementing genetic algorithms to evolve and optimize complex robotic behaviors, now enhanced by integrating pre-trained DQN models for more effective learning. 🧬
-- **Neural Network Integration**: Embedding advanced neural networks for decision-making and adaptive learning, leveraging the synergy between DQN and GA. 🧠
-- **Real-Time Data Handling**: Managing sensor data essential for real-time decisions and performance analysis. ⏱️
-- **Dynamic Visualization**: Providing real-time visualization of key metrics to aid in understanding and analyzing the evolutionary and learning processes. 📊
+Seph's Biome integrates concepts from robotics, AI, and biology, aiming to achieve the following objectives:
 
-The overarching goal is to create a self-evolving robotic system, emulating and enhancing biological processes and behaviors through iterative refinement of its GA for extensive multimodal hyperparameter tuning of its RL model, leading to an optimized system for multimodal functionality in a robotics context. 🌱🤖
+- **Robotic Simulation**: Employing ROS to simulate realistic robotic behaviors across different scenarios. This includes navigating environments, interacting with objects, and performing tasks autonomously. 🤖
+
+- **Evolutionary Algorithms for Real-Time Optimization**: Implementing genetic algorithms to evolve and optimize complex robotic behaviors. This process is now enhanced by integrating a custom Q-learning layer, allowing the system to adapt and improve its performance over time. 🧬
+
+- **Neural Network Integration**: Integrating a custom Q-learning layer into the system to facilitate decision-making and adaptive learning. The Q-learning model is fine-tuned and optimized using a genetic algorithm component designed for dynamic, runtime adjustments. This integration allows for efficient learning and adaptation in robotic behaviors. 🧠
+
+- **Real-Time Data Handling**: Managing sensor data essential for real-time decisions and performance analysis. This includes processing inputs from various sensors such as cameras, LiDAR, and accelerometers to make informed decisions and adjust behavior accordingly. ⏱️
+
+- **Dynamic Visualization**: Providing real-time visualization of key metrics to aid in understanding and analyzing the evolutionary and learning processes. This enables researchers and developers to monitor the system's performance, identify areas for improvement, and optimize its behavior in real-time. 📊
+
+The overarching goal is to create a self-evolving robotic system that emulates and enhances biological processes and behaviors. Through iterative refinement of its genetic algorithms and reinforcement learning models, the system aims to achieve extensive multimodal hyperparameter tuning, leading to an optimized system capable of multimodal functionality in various robotics contexts. 🌱🤖
+
