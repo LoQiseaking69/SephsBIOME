@@ -31,7 +31,7 @@ python3 main.py
 An executable script (.sh) is planned for ease of use upon release. 😅
 
 # The initial modal
-for the "GA" management and tuning *(that is, this repository, The SephsBIOME Project, and will slowly be converted into a shared rust library)* 
+for the "GA" management and tuning *(that is, this repository, The SephsBIOME Project, will slowly be converted into a shared rust library)* 
 the initial neural network is located at [this repository; for isolating building and testing](https://github.com/LoQiseaking69/SephMV)
 
 ## Evolution of AI Integration 🌐🔧
