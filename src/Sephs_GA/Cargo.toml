@@ -4,17 +4,15 @@ version = "0.1.0"
 authors = ["Ant OG <Reel0112358.13@proton.me>"]
 edition = "2021"
 description = "An advanced and sophisticated genetic algorithm system in Rust for SephsBIOME."
-license = "MIT"
+license = "GPL-3.0"
 
 [dependencies]
 rand = "0.8"
 ndarray = "0.15"
 rayon = "1.5"
-# Assuming TensorFlow models are interfaced through Python
 pyo3 = { version = "0.15", features = ["extension-module"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-# Using rosrust for ROS functionalities
 rosrust = "0.9"
 log = "0.4"
 env_logger = "0.9"
