@@ -10,12 +10,14 @@ license = "MIT"
 rand = "0.8"
 ndarray = "0.15"
 rayon = "1.5"
-tensorflow = "0.17"
+# Assuming TensorFlow models are interfaced through Python
+pyo3 = { version = "0.15", features = ["extension-module"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-rosc = "0.5"
+# Using rosrust for ROS functionalities
+rosrust = "0.9"
 log = "0.4"
 env_logger = "0.9"
 
 [workspace]
-path = "../SephsBIOME-master"
+members = ["../SephsBIOME-master"]
