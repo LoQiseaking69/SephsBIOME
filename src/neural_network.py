@@ -13,6 +13,7 @@ Research and implementation expertise...
 
 For more up-to-date implementation, method and architecture
 Please review other related repositories.
+keep it up✊🏼 🙏refine your work!
 '''
 
 # BoolformerLayer implementation from neural_network.py
