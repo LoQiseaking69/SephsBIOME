@@ -6,6 +6,15 @@ from sklearn.preprocessing import StandardScaler
 import random
 import numpy as np
 
+'''
+this model Concept / architecture is
+The initial draft model based on initial 
+Research and implementation expertise...
+
+For more up-to-date implementation, method and architecture
+Please review other related repositories.
+'''
+
 # BoolformerLayer implementation from neural_network.py
 class BoolformerLayer(layers.Layer):
     def __init__(self, embedding_dim=8, num_heads=2, threshold_init_value=0.5, **kwargs):
