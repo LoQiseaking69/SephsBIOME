@@ -32,7 +32,7 @@ An executable script (.sh) is planned for ease of use upon release. 😅
 
 # The initial modal
 for the "GA" management and tuning *(that is, this repository, The SephsBIOME Project.)* will slowly be converted into a shared rust library...
-the initial neural network is located at [this repository; and a second concept architecture for isolating building and testing is at the repository following this link.](https://github.com/LoQiseaking69/SephMV)
+the initial neural network is located at this repository and a second concept architecture for isolating building and testing is at the repository following this [link.](https://github.com/LoQiseaking69/SephMV)
 
 ## Evolution of AI Integration 🌐🔧
 
