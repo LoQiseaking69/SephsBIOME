@@ -12,7 +12,7 @@ Seph's Biome represents a pioneering venture in the realm of robotic operating s
 
 ### Prerequisites
 - Python - latest release 🐍
-- ROS Noetic (future updates to Foxy planned) 🤖
+- ROS 🤖🦿🦾
 - Docker (optional) 🐳
 
 ### Setup
